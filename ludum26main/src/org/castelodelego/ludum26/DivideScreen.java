@@ -4,8 +4,10 @@ import java.util.Iterator;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
@@ -21,6 +23,15 @@ import com.badlogic.gdx.utils.Array;
  */
 
 public class DivideScreen implements Screen {
+	
+	static int MAXLINESIZE = 500;
+	
+	boolean initialized;
+	boolean startflood;
+	float timeaccum;
+	
+	static float flooddelta = 0.05f;
+	static int floodsteps = 5000;
 
 	ludum26entry g; // The overall Game class, used leaving this screen if necessary
 	OrthographicCamera camera;
@@ -33,6 +44,8 @@ public class DivideScreen implements Screen {
 
 	PuzzleImage puzzle;
 	Vector2 puzzlepos;
+	Texture puzzleDrawing;
+	Texture puzzleFlood;
 	
 	// Image to be drawn
 	// Geometric data of this image
@@ -41,20 +54,38 @@ public class DivideScreen implements Screen {
 	{
 		g = game;		
 		camera = new OrthographicCamera();
+		camera.setToOrtho(false, 800, 480);
+		
+		dividingLine = new Array<Vector2>();
+		
 		lineDrawer = new ShapeRenderer();
 		batch = new SpriteBatch();
 		
-		init();
+		initialized = false;
 	}
 	
 	public void init()
 	{
-		camera.setToOrtho(false, 800, 480);
-		dividingLine = new Array<Vector2>();
+		if (!initialized)
+		{
+			Gdx.app.log("DivideScreen","initialized");
+			
+			dividingLine.clear();
+		
+			puzzle = new PuzzleImage("levels/testlevel.png",g);
+			
+			puzzleDrawing = new Texture(puzzle.orig);
+			puzzleDrawing.draw(puzzle.orig, 0, 0);
+			
+			puzzleFlood = new Texture(puzzle.flood);
+			puzzleFlood.draw(puzzle.flood,0,0);
 
-		puzzle = new PuzzleImage(700,380);
-		puzzlepos = new Vector2(50,50);
-		nowDrawing = false;
+			puzzlepos = new Vector2(50,50);
+			nowDrawing = false;		
+			startflood = false;
+			timeaccum = 0;
+		}
+		initialized = true;
 	}
 	
 	
@@ -67,14 +98,35 @@ public class DivideScreen implements Screen {
 
 		camera.update();
 
-		// DRAWING THE TEXTURE -- TEMPORARY
+		// Re-drawing the textures from the puzzle
+		puzzleDrawing.draw(puzzle.orig, 0, 0);
+		puzzleFlood.draw(puzzle.flood,0,0);
+		
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
-		   batch.draw(puzzle.getTexture(), puzzlepos.x, puzzlepos.y);
+			batch.draw(puzzleDrawing, puzzlepos.x, puzzlepos.y);
+			//batch.setColor(1, 1, 1, 0.5f);
+			batch.draw(puzzleFlood, puzzlepos.x, puzzlepos.y);
 		batch.end();
 		
 		
+		// FLOODING
+		if (startflood)
+		{
+			timeaccum += delta;
+			while (timeaccum > flooddelta)
+			{
+				timeaccum -= flooddelta;
+				if (puzzle.floodfill(floodsteps))
+					startflood = false;
+			}
+		}
 		
+		
+		
+		
+		
+		// Drawing the local line
 		if (dividingLine.size > 0)
 		{
 			lineDrawer.setProjectionMatrix(camera.combined);
@@ -87,7 +139,6 @@ public class DivideScreen implements Screen {
 			while (it.hasNext())
 			{
 				P1 = it.next();
-				//lineDrawer.circle(P1.x, P1.y, 4);
 				if (P2 != null)
 					lineDrawer.line(P2.x, P2.y, P1.x, P1.y);
 				P2 = P1;
@@ -97,6 +148,7 @@ public class DivideScreen implements Screen {
 		
 		
 	
+		// ** FIXME: Separate input from rendering -- LOW PRIORITY
 		if(Gdx.input.isTouched()) 
 		{
 			Vector3 touchPos = new Vector3();
@@ -108,26 +160,24 @@ public class DivideScreen implements Screen {
 			{
 				nowDrawing = true;
 				dividingLine.clear();
-				
-				// DEBUG FIXME INNEFICIENT
-				puzzle.dispose();
-				puzzle = new PuzzleImage(700,380);
 			}
 			
-			// FIXME - I must take care with the touch resolution!
-			if (dividingLine.size < 300)
-				dividingLine.add(newpoint);
-			
+			if (dividingLine.size < MAXLINESIZE)
+				dividingLine.add(newpoint);			
 		}
 		else 
 		{
+			// STOPPED DRAWING
 			if (nowDrawing) // stopped drawing - transfer drawing to the puzzle
 			{
-				puzzle.addLine(dividingLine, puzzlepos);
-				puzzle.floodfill();
-				puzzle.updateTexture();
+				puzzle.reset();
+				Gdx.app.log("ping","ping");
+				puzzle.setLine(dividingLine, puzzlepos);
+				puzzle.drawDivLine(Color.BLACK);
+
 				dividingLine.clear();
 				nowDrawing = false;
+				startflood = true;
 			}
 		}
 		
@@ -146,7 +196,7 @@ public class DivideScreen implements Screen {
 
 	@Override
 	public void show() {
-		// TODO Auto-generated method stub
+		init();
 
 	}
 

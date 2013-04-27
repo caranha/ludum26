@@ -4,6 +4,7 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 
@@ -26,13 +27,17 @@ public class ludum26entry extends Game {
 		title = new MainScreen(this);
 		about = new AboutScreen(this);
 		play = new DivideScreen(this);
-		play = new DivideScreen(this);
+		menu = new SelectScreen(this);
 		
 		// LOADING ASSETS
 		manager = new AssetManager();
 		manager.load("fairking.png", Texture.class);
 		manager.load("sawasdee.fnt", BitmapFont.class);
 		manager.load("Beaulieux.fnt", BitmapFont.class);
+		
+		// LOADING LEVELS
+		manager.load("levels/testlevel.png", Pixmap.class);
+		
 		//manager.load("data/mymusic.ogg", Music.class);
 		
 		

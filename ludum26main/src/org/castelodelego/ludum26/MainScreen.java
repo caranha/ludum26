@@ -90,6 +90,9 @@ public class MainScreen implements Screen {
 		
 		batch.end();
 		
+		if(Gdx.input.isTouched())
+			g.setScreen(g.play);
+		
 		
 	}
 

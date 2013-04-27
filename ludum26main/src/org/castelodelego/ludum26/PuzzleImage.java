@@ -6,7 +6,6 @@ import java.util.Stack;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -21,85 +20,115 @@ import com.badlogic.gdx.utils.Array;
  */
 public class PuzzleImage {
 	
-	
-	Pixmap puzzle;
-	Texture renderable;
+	static int[][] dir = {{1,0},{0,1},{-1,0},{0,-1}};	
+
+	Pixmap flood;
+	Pixmap orig;
+
 	
 	int H, W;
 	
 	// Colors for this puzzle Image
-	Color lineColor;
-	Color paintColor[]; // Resource 1, before sharing 
-	int[] pcount; // Counts for balance;
+	static int lineColor = Color.rgba8888(0f,0f,0f,1f); // black
+
+	static int RedColor = Color.rgba8888(1f,0f,0f,0.7f); // red
+	static int BlueColor = Color.rgba8888(0f,0f,1f,0.7f); // blue
+	boolean paintingRed; // which colors we are painting now
+	
+	int colortable[];
+	int colorcount[][];
+	
+	Array<Point> divLine;
+
+	boolean[][] visited;
+	Stack<Point> currStack;
+	Stack<Point> nextStack;
 	
 	/**
 	 * Default Constructor, uses pre-set images and colors
 	 */
-	public PuzzleImage(int w, int h)
+	public PuzzleImage(String name, ludum26entry g)
 	{
-		H = h;
-		W = w;
-		pcount = new int[2];
+		orig = g.manager.get(name, Pixmap.class);
+				
+		W = orig.getWidth();
+		H = orig.getHeight();
 		
-		puzzle = new Pixmap(w,h,Format.RGBA8888);
-		lineColor = Color.ORANGE;
-		paintColor = new Color[2];
-		paintColor[0] = Color.BLUE;
-		paintColor[1] = Color.CYAN;
+		flood = new Pixmap(W,H,Pixmap.Format.RGBA8888);
+		divLine = new Array<Point>();
+
+		// finding the number of colors
+		int ncolor = 0;
+		while (orig.getPixel(ncolor, 0)!=Color.rgba8888(1, 1, 1, 1))
+			ncolor++;
 		
-		puzzle.setColor(Color.GREEN);
-		puzzle.fill();
-		puzzle.setColor(paintColor[0]);
-		puzzle.fillRectangle(50, 50, 500, 125);
-		puzzle.fillRectangle(500,170,560,300);
+		colortable = new int[ncolor];
+		colorcount = new int[ncolor][2];
 		
-		renderable = new Texture(puzzle);
+		for (int i = 0; i < ncolor; i++) // setting the relevant colors
+		{
+			colortable[i] = orig.getPixel(i, 0);
+			orig.drawPixel(i, 0,Color.rgba8888(1, 1, 1, 1));
+		}
+		
+		currStack = new Stack<Point>();
+		nextStack = new Stack<Point>();
+		
+		reset();		
 	}
 	
-	public boolean floodfill()
+	// Resets the puzzle to be played again;
+	public void reset()
 	{
-		
-		pcount[0] = 0;
-		pcount[1] = 0;
-		boolean[][] visited = new boolean[W][H]; // if I have visited some place or not
+		flood.setColor(0, 0, 0, 0);
+		flood.fill();
+				
+		colorcount = new int[colorcount.length][2];
+		visited = new boolean[W][H];
 
-		Stack<Point> curStack = new Stack<Point>(); // This stack contains the elements that I am painting at this moment;
-		Stack<Point> nextStack = new Stack<Point>(); // This stack contains the elements that I will paint next
-		
-		int[][] dir = {{1,0},{0,1},{-1,0},{0,-1}};
-		boolean isPainting = true; //are we painting now?
-		
-		curStack.push(new Point(0,0)); // adding the initial point
+		// resetting flooding algorithm
+		currStack.clear();
+		nextStack.clear();
+		currStack.push(new Point(0,0)); // adding the initial point
 		visited[0][0] = true;
-		
+		paintingRed = true;
+	}
+	
+	/**
+	 * Performs floodfilling for "int" steps
+	 * Returns true if flood filling has finished, or false if it has not.
+	 * @param steps
+	 * @return
+	 */
+	public boolean floodfill(int steps)
+	{
 		Point cur;
 		Point t;
-
-		int lcolor = Color.rgba8888(lineColor);
-		int fcolor = Color.rgba8888(paintColor[0]);
-		int pcolor = Color.rgba8888(paintColor[1]);
 		int curcolor;
+	
+		int stepcount = 0;
 		
-		while(!curStack.empty() || !nextStack.empty())
+		while(!currStack.empty() || !nextStack.empty())
 		{
-			while(!curStack.empty())
+			while(!currStack.empty())
 			{
-				cur = curStack.pop();
-				curcolor = puzzle.getPixel(cur.x,cur.y);
+				cur = currStack.pop();
+				curcolor = orig.getPixel(cur.x,cur.y);
 				
 				// Paint this position if necessary:
-				if (curcolor == fcolor)
-					if (isPainting)
-					{
-						pcount[1] += 1;
-						puzzle.drawPixel(cur.x,cur.y,pcolor);
-					}
-					else
-					{
-						pcount[0] += 1;
-					}
-							
-				
+				for (int i = 0; i < colortable.length; i++)
+					if (curcolor == colortable[i])
+						if (paintingRed)
+						{
+							colorcount[i][0] += 1;
+							flood.drawPixel(cur.x, cur.y,RedColor);
+						}
+						else
+						{
+							colorcount[i][1] += 1;
+							flood.drawPixel(cur.x, cur.y,BlueColor);
+						}
+															
 				// Put pixels around this one in the stack
 				for (int i = 0; i < 4; i++)
 				{
@@ -107,62 +136,63 @@ public class PuzzleImage {
 					if ((t.x >= 0 && t.x < W && t.y >=0 && t.y < H) && (!visited[t.x][t.y]))
 					{ // valid and not visited point
 						visited[t.x][t.y] = true;
-						curcolor = puzzle.getPixel(t.x,t.y);
-						if (curcolor == lcolor)
+						if (flood.getPixel(t.x,t.y) == lineColor) // on the line, reserve for the next Stack
 							nextStack.push(t);
-						else
-							curStack.push(t);
+						else // not on the line
+							currStack.push(t);
 					}
 				}
 				
+				stepcount += 1;
+				if (stepcount >= steps)
+					return false; // ran out of steps
 			}			
-			isPainting = !isPainting;
-			curStack = nextStack;
+			paintingRed = !paintingRed;
+			currStack = nextStack;
 			nextStack = new Stack<Point>();
 		}
 		
-		Gdx.app.log("PuzzleScore", "Division: " + ((pcount[0]*1.0)/(pcount[0]+pcount[1])));		
+		for (int i = 0; i < colortable.length; i++)
+			Gdx.app.log("PuzzleScore", "Color "+i+": " + ((colorcount[i][0]*1.0)/(colorcount[i][0]+colorcount[i][1])));		
+
 		return true;
 	}
 	
 	
-	// Adds a dividing line into this pixmap - the offset is the difference between the line coordinates and the puzzleimage coordinates on the screen
-	public void addLine(Array<Vector2> line, Vector2 offset)
+	// Sets the Div Line
+	public void setLine(Array<Vector2> line, Vector2 offset)
 	{
 		Iterator<Vector2> it = line.iterator();
-		Vector2 P1, P2 = null;
-		
-		
-		puzzle.setColor(lineColor);
+		Vector2 tmp;
+		divLine.clear();
+
 		while (it.hasNext())
 		{
-			P1 = it.next().cpy();
-			P1.sub(offset);
-			
+			tmp = it.next().cpy();
+			tmp.sub(offset);
+			divLine.add(new Point(Math.round(tmp.x), H - Math.round(tmp.y)));
+		}
+	}
+
+	// Draws the Div Line in a certain color
+	public void drawDivLine(Color c)
+	{
+		Point P1,P2 = null;
+		Iterator<Point> it = divLine.iterator();
+
+		 flood.setColor(c);
+		while (it.hasNext())
+		{
+			P1 = it.next();
 			if (P2 != null)
-				puzzle.drawLine(Math.round(P2.x), H - Math.round(P2.y), Math.round(P1.x), H - Math.round(P1.y));
+				flood.drawLine(P2.x, P2.y, P1.x, P1.y);
 			P2 = P1;
 		}
-		
-		renderable.draw(puzzle, 0, 0);
-	}
-	
-
-	public Texture updateTexture()
-	{
-		renderable.draw(puzzle, 0, 0);
-		return renderable;
-	}
-	
-	// draw this pixmap
-	public Texture getTexture()
-	{
-		return renderable;
 	}
 	
 	public void dispose()
 	{
-		puzzle.dispose();
-		renderable.dispose();
+		flood.dispose();
+		orig.dispose();
 	}
 }
