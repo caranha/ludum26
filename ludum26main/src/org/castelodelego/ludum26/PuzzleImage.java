@@ -137,9 +137,7 @@ public class PuzzleImage {
 		while (it.hasNext())
 		{
 			P1 = it.next().cpy();
-			Gdx.app.log("PuzzleImgDraw", "P1:"+P1.x+" "+P1.y + " -- offset " + offset.x + " " + offset.y);
 			P1.sub(offset);
-			Gdx.app.log("PuzzleImgDraw", "New P1:"+P1.y + " || try " + (H - P1.y));
 			
 			if (P2 != null)
 				puzzle.drawLine(Math.round(P2.x), H - Math.round(P2.y), Math.round(P1.x), H - Math.round(P1.y));
