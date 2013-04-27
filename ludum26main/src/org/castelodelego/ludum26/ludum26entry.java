@@ -4,6 +4,7 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -29,21 +30,31 @@ public class ludum26entry extends Game {
 		play = new DivideScreen(this);
 		menu = new SelectScreen(this);
 		
-		// LOADING ASSETS
-		manager = new AssetManager();
-		manager.load("fairking.png", Texture.class);
-		manager.load("sawasdee.fnt", BitmapFont.class);
-		manager.load("Beaulieux.fnt", BitmapFont.class);
-		
-		// LOADING LEVELS
-		manager.load("levels/testlevel.png", Pixmap.class);
-		
-		//manager.load("data/mymusic.ogg", Music.class);
-		
+		queueAssets();
 		
 		Gdx.app.setLogLevel(Application.LOG_DEBUG);
 		setScreen(splash); 
 	
 	}
+	
+	private void queueAssets()
+	{
+		manager = new AssetManager();
+		
+		// Loading images
+		manager.load("fairking.png", Texture.class);
+		manager.load("sawasdee.fnt", BitmapFont.class);
+		manager.load("Beaulieux.fnt", BitmapFont.class);
+		
+		// Loading levels
+		for (int i = 0; i < LevelManager.levelList.length; i++)
+		{
+			manager.load(LevelManager.levelList[i][0], Pixmap.class);
+		}
+		
+		//manager.load("data/mymusic.ogg", Music.class);
 
+	}
+
+	//TODO: Add asset Disposal by the end of the game
 }

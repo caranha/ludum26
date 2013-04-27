@@ -92,8 +92,7 @@ public class MainScreen implements Screen {
 		
 		if(Gdx.input.isTouched())
 			g.setScreen(g.play);
-		
-		
+				
 	}
 
 	@Override

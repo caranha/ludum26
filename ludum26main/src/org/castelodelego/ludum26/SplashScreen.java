@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 
 public class SplashScreen implements Screen {
 
@@ -45,6 +46,7 @@ public class SplashScreen implements Screen {
 		
 		Gdx.gl.glClearColor(1, 1, 1, 1); // clearing the screen
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
 		
 		loaddone = g.manager.update();		
 		loadprogress = g.manager.getProgress();
@@ -62,10 +64,23 @@ public class SplashScreen implements Screen {
 				
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
-		batch.setColor(1f, 1f, 1f, fade);
 		batch.draw(splashimg, 0,0);
 		batch.end();
+
 		
+		// Drawing Fading
+		if (fade < 1.0f)
+			{
+				Gdx.gl.glEnable(GL20.GL_BLEND);
+				Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+				lineDrawer.setProjectionMatrix(camera.combined);
+				lineDrawer.begin(ShapeType.FilledRectangle);
+				lineDrawer.setColor(1f, 1f, 1f, 1-fade);
+				// FIXME: Do I need to specify changing sides here, or does the camera takes care of this for me?
+				lineDrawer.filledRect(0, 0, 800, 480);		
+				lineDrawer.end();
+			}
+		// End Drawing Fading
 		
 
 		if ((fade <= 0) && (loaddone))
