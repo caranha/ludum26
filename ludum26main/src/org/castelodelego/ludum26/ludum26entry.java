@@ -4,6 +4,8 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -54,9 +56,10 @@ public class ludum26entry extends Game {
 		for (int i = 0; i < LevelManager.levelList.length; i++)
 		{
 			manager.load(LevelManager.levelList[i][0], Pixmap.class);
-		}
-		
-		//manager.load("data/mymusic.ogg", Music.class);
+		}		
+		manager.load("purplewah.ogg", Music.class);
+		manager.load("filling.ogg", Sound.class);
+		manager.load("drawing.ogg", Sound.class);
 
 	}
 

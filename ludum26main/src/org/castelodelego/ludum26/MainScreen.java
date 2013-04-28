@@ -2,6 +2,7 @@ package org.castelodelego.ludum26;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -12,6 +13,9 @@ import com.badlogic.gdx.graphics.g2d.BitmapFontCache;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 
 public class MainScreen implements Screen {
 
@@ -28,9 +32,16 @@ public class MainScreen implements Screen {
 	Texture king;
 	
 	BitmapFontCache titletext;
+
 	BitmapFontCache playbtn;
+	Rectangle playbtnBox;
+	
 	BitmapFontCache aboutbtn;
+	Rectangle aboutbtnBox;
+	
 	BitmapFontCache ld26text;
+	
+	Music mainmusic; // FIXME: no idea where to put this;
 	
 	
 	static float FADE_T = 0.2f; 
@@ -64,13 +75,21 @@ public class MainScreen implements Screen {
 		titletext.addText("The Fair Kingo", 325, 430);
 		titletext.setColor(Color.DARK_GRAY);
 		
+		mainmusic = ludum26entry.manager.get("purplewah.ogg",Music.class);
+		mainmusic.setLooping(true);
+		mainmusic.play();
+		
 		text = ludum26entry.manager.get("sawasdee.fnt", BitmapFont.class);
 		playbtn = new BitmapFontCache(text,true);
 		aboutbtn = new BitmapFontCache(text,true);
 		ld26text = new BitmapFontCache(text,true);
 		
 		playbtn.addText("Play", 360, 250);
+		playbtnBox = new Rectangle(360, 250 - playbtn.getBounds().height, playbtn.getBounds().width,playbtn.getBounds().height);
+		
 		aboutbtn.addText("About", 600, 250);
+		aboutbtnBox = new Rectangle(600, 250 - aboutbtn.getBounds().height, aboutbtn.getBounds().width,aboutbtn.getBounds().height);
+		
 		ld26text.addMultiLineText("A game for Ludum Dare 26\nby caranha", 800, 100, -60, HAlignment.RIGHT);
 		
 		playbtn.setColor(Color.DARK_GRAY);
@@ -120,8 +139,15 @@ public class MainScreen implements Screen {
 		{
 			if(Gdx.input.isTouched())
 			{
-				leavescreen = true;
-				nextScreen = g.play;
+				Vector3 rawtouch = new Vector3(Gdx.input.getX(), Gdx.input.getY(),0);
+				camera.unproject(rawtouch);
+				Vector2 touchpos = new Vector2(rawtouch.x, rawtouch.y);
+				
+				if (playbtnBox.contains(touchpos.x, touchpos.y))
+				{
+					leavescreen = true;
+					nextScreen = g.play;
+				}
 			}
 		}
 		
@@ -146,6 +172,10 @@ public class MainScreen implements Screen {
 		}
 				
 	}
+	
+	
+
+	
 
 	@Override
 	public void resize(int width, int height) {

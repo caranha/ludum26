@@ -194,7 +194,7 @@ public class PuzzleImage {
 				currentgrade = 2;
 			if (currentgrade > 1 && unbalance > 0.025)
 				currentgrade = 1;
-			if (currentgrade > 0 && unbalance > 0.05)
+			if (currentgrade > 0 && unbalance > 0.075)
 				currentgrade = 0;
 		}
 		redbluescore = divisions[unbalanceindex];

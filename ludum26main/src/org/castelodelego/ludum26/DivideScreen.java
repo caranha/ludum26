@@ -5,13 +5,14 @@ import java.util.Iterator;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
 import com.badlogic.gdx.graphics.g2d.BitmapFontCache;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -35,6 +36,7 @@ public class DivideScreen implements Screen {
 	boolean initialized;
 	boolean startflood;
 	//float timeaccum;
+	int GL10offset;
 	
 	static float flooddelta = 0.05f;
 	static int floodsteps = 5000;
@@ -55,6 +57,7 @@ public class DivideScreen implements Screen {
 	private float timeaccum; // used to calculate flooding time
 	
 	BitmapFontCache returnButton;
+	BitmapFontCache titleText;
 	BitmapFont scoreFont;
 	BitmapFont textFont;
 	
@@ -76,6 +79,8 @@ public class DivideScreen implements Screen {
 	private boolean leaveScreen;
 	private Screen nextScreen;
 	
+	Sound fillingsnd;
+	Sound drawingsnd;
 	
 	float fadestate; // used to calculate fading time
 	static float FADETIME = 0.2f;
@@ -107,14 +112,23 @@ public class DivideScreen implements Screen {
 			curState = STATE_FADEIN;
 			curLevel = 0;
 			
+
+			
 			dividingLine.clear();
 			
 			returnButton = new BitmapFontCache(ludum26entry.manager.get("sawasdee.fnt", BitmapFont.class),true);
+			titleText = new BitmapFontCache(ludum26entry.manager.get("sawasdee.fnt", BitmapFont.class),true);
 			scoreFont = ludum26entry.manager.get("sawasdee.fnt", BitmapFont.class);
 			textFont = ludum26entry.manager.get("Beaulieux.fnt", BitmapFont.class);
 			
+			fillingsnd = ludum26entry.manager.get("filling.ogg", Sound.class);
+			drawingsnd = ludum26entry.manager.get("drawing.ogg", Sound.class);
+			
+			
+			// FIXME: Put the position of the return button somewhere saner;
 			float xpos = 400-(197.0f/2);
-			float ypos = 470;
+			float ypos = 40;
+			
 			returnButton.addText("Return to Title", xpos, ypos); // This is ugly
 			returnButton.setColor(Color.DARK_GRAY);
 			//returnButtonBox = new Rectangle(returnButton.getX(),returnButton.getY(),returnButton.getBounds().width,returnButton.getBounds().height);	
@@ -124,11 +138,18 @@ public class DivideScreen implements Screen {
 		
 			puzzle = g.lmanager.getLevel(curLevel);
 			
-			puzzleDrawing = new Texture(puzzle.orig);
-			//puzzleDrawing.draw(puzzle.orig, 0, 0);
-			
-			puzzleFlood = new Texture(puzzle.flood);
-			//puzzleFlood.draw(puzzle.flood,0,0);
+			if (Gdx.graphics.isGL20Available())
+			{
+				puzzleDrawing = new Texture(puzzle.orig);
+				puzzleFlood = new Texture(puzzle.flood);
+				GL10offset = 0;
+			}
+			else
+			{
+				puzzleDrawing = new Texture(1024,512,Format.RGBA8888);
+				puzzleFlood = new Texture(1024,512,Format.RGBA8888);
+				GL10offset = 132;
+			}
 
 			puzzlepos = new Vector2(50,50);
 			nowDrawing = false;		
@@ -142,6 +163,8 @@ public class DivideScreen implements Screen {
 		puzzle = g.lmanager.getLevel(curLevel);
 		puzzle.reset();
 	
+		titleText.setText(LevelManager.levelList[curLevel][1], 400-(scoreFont.getBounds(LevelManager.levelList[curLevel][1]).width/2), 470); // This is ugly
+		
 		curState = STATE_FADEIN;
 		timeaccum = 0;
 		fadestate = 0;
@@ -153,7 +176,7 @@ public class DivideScreen implements Screen {
 		leaveScreen = false;
 		nextScreen = g.play;
 		
-		puzzleDrawing.draw(puzzle.orig, 0, 0);
+		puzzleDrawing.draw(puzzle.orig, 0, GL10offset);
 	}
 	
 	
@@ -169,16 +192,18 @@ public class DivideScreen implements Screen {
 		
 		// Drawing the puzzle Textures
 		// puzzleDrawing.draw(puzzle.orig, 0, 0); // IF PUZZLE DOES NOT UPDATE, TRY UNCOMMENTING THIS
-		puzzleFlood.draw(puzzle.flood,0,0);
+		puzzleFlood.draw(puzzle.flood,0,GL10offset);
 		
 		//
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
-			batch.disableBlending();
+			//batch.disableBlending();
 			batch.draw(puzzleDrawing, puzzlepos.x, puzzlepos.y);
-			batch.enableBlending();
+			//batch.enableBlending();
 			batch.draw(puzzleFlood, puzzlepos.x, puzzlepos.y);
 			returnButton.draw(batch);
+			titleText.setColor(Color.DARK_GRAY);
+			titleText.draw(batch);
 		batch.end();
 		
 		// Drawing Guide // TODO: REPLACE THIS WITH SOMETHING BETTER
@@ -236,8 +261,8 @@ public class DivideScreen implements Screen {
 			
 		if (wastouched && curState != STATE_FADEIN && curState != STATE_FADEOUT)
 		{
-			// THIS ALWAYS HAPPENS
-			if (returnButtonBox.contains(touchpos.x, touchpos.y))
+			// THIS ALWAYS HAPPENS -- except when dr
+			if (returnButtonBox.contains(touchpos.x, touchpos.y) && !nowDrawing)
 			{
 				Gdx.app.debug("touchtest", "Touched Return Button");
 				leaveScreen = true;
@@ -252,6 +277,7 @@ public class DivideScreen implements Screen {
 					{
 						nowDrawing = true;
 						dividingLine.clear();
+						drawingsnd.loop(0.2f);
 					}
 					if (dividingLine.size < MAXLINESIZE)
 						dividingLine.add(new Vector2(touchpos));					
@@ -276,6 +302,7 @@ public class DivideScreen implements Screen {
 			dividingLine.clear();
 
 			nowDrawing = false;
+			drawingsnd.stop();
 			startflood = true; // SIGNAL TO CHANGE THE STATE TO STATE_CALCULATE
 		}
 		
@@ -286,6 +313,8 @@ public class DivideScreen implements Screen {
 		if (leaveScreen) // This Always happens
 		{
 			curState = STATE_FADEOUT;
+			fillingsnd.stop();
+			drawingsnd.stop();
 			leaveScreen = false;
 		}
 		
@@ -308,6 +337,9 @@ public class DivideScreen implements Screen {
 			{
 				curState = STATE_CALCULATE;
 				startflood = false;
+				
+				long t = fillingsnd.loop(0.2f);
+				fillingsnd.setPitch(t, 0.5f);
 			}
 			break;
 			
@@ -325,8 +357,9 @@ public class DivideScreen implements Screen {
 				if (puzzle.floodfill(floodsteps))
 				{
 					curState = STATE_WAIT;
+					fillingsnd.stop();
 					puzzle.setScore();
-					setScoreScene();
+					setScoreScene();					
 				}
 			}
 			break;		
