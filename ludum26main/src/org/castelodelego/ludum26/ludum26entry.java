@@ -4,7 +4,6 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -17,7 +16,8 @@ public class ludum26entry extends Game {
 	SelectScreen menu;
 	DivideScreen play;
 	
-	AssetManager manager;
+	static AssetManager manager;
+	LevelManager lmanager;
 	
 
 	// Called when the game is first started
@@ -31,6 +31,9 @@ public class ludum26entry extends Game {
 		menu = new SelectScreen(this);
 		
 		queueAssets();
+		
+		lmanager = new LevelManager();
+		lmanager.loadLevelData();
 		
 		Gdx.app.setLogLevel(Application.LOG_DEBUG);
 		setScreen(splash); 

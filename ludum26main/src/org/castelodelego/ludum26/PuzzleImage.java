@@ -46,9 +46,9 @@ public class PuzzleImage {
 	/**
 	 * Default Constructor, uses pre-set images and colors
 	 */
-	public PuzzleImage(String name, ludum26entry g)
+	public PuzzleImage(String name)
 	{
-		orig = g.manager.get(name, Pixmap.class);
+		orig = ludum26entry.manager.get(name, Pixmap.class); // static call!
 				
 		W = orig.getWidth();
 		H = orig.getHeight();

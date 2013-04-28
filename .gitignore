@@ -4,4 +4,4 @@
 /pyTest
 /testgdxgame*
 /.metadata
-.class
+*.class

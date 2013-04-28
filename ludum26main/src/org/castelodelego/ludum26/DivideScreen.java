@@ -47,8 +47,14 @@ public class DivideScreen implements Screen {
 	Texture puzzleDrawing;
 	Texture puzzleFlood;
 	
-	// Image to be drawn
-	// Geometric data of this image
+	static int STATE_FADEIN = 0;
+	static int STATE_DRAW = 1;
+	static int STATE_CALCULATE = 2;
+	static int STATE_WAIT = 3;
+	static int STATE_FADEOUT = 4;
+	
+	int curLevel;
+	int curState;
 	
 	public DivideScreen(ludum26entry game)
 	{
@@ -69,29 +75,41 @@ public class DivideScreen implements Screen {
 		if (!initialized)
 		{
 			Gdx.app.log("DivideScreen","initialized");
+			curState = STATE_FADEIN;
+			curLevel = 0;
 			
 			dividingLine.clear();
 		
-			puzzle = new PuzzleImage("levels/testlevel.png",g);
+			puzzle = g.lmanager.getLevel(curLevel);
 			
 			puzzleDrawing = new Texture(puzzle.orig);
-			puzzleDrawing.draw(puzzle.orig, 0, 0);
+			//puzzleDrawing.draw(puzzle.orig, 0, 0);
 			
 			puzzleFlood = new Texture(puzzle.flood);
-			puzzleFlood.draw(puzzle.flood,0,0);
+			//puzzleFlood.draw(puzzle.flood,0,0);
 
 			puzzlepos = new Vector2(50,50);
 			nowDrawing = false;		
 			startflood = false;
 			timeaccum = 0;
+			
 		}
 		initialized = true;
 	}
 	
+	public void reset()
+	{
+		puzzle = g.lmanager.getLevel(curLevel);
+		puzzle.reset();
+		curState = STATE_FADEIN;
+		timeaccum = 0;
+		dividingLine.clear();
+	}
+	
+	
 	
 	@Override
 	public void render(float delta) {
-		// TODO Auto-generated method stub
 		Gdx.gl.glClearColor(1, 1, 1, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 
@@ -190,32 +208,31 @@ public class DivideScreen implements Screen {
 
 	@Override
 	public void resize(int width, int height) {
-		// TODO Auto-generated method stub
-
+		// TODO CHANGE RESIZE TO HOLD THE SCREEN SIZE -- PROBABLY CHANGE THIS IN "GAME"
 	}
 
 	@Override
 	public void show() {
 		init();
-
+		reset();
 	}
 
 	@Override
 	public void hide() {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void pause() {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
+	/**
+	 * When resuming on Android, the game returns to the title screen
+	 */
 	public void resume() {
-		// TODO Auto-generated method stub
-
+		g.setScreen(g.title);
 	}
 
 	@Override

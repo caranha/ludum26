@@ -15,6 +15,7 @@ public class LevelManager {
 	
 	
 	int totalLevels;
+	PuzzleImage[] levels;
 	
 	public boolean[] unlocked;
 	public int[] score;
@@ -28,7 +29,16 @@ public class LevelManager {
 		unlocked = new boolean[totalLevels];
 		unlocked[0] = true;
 		
+		levels = new PuzzleImage[totalLevels];
+		
 		score = new int[totalLevels];
+	}
+	
+	public PuzzleImage getLevel(int n)
+	{
+		if (levels[n] == null)
+			levels[n] = new PuzzleImage(LevelManager.levelList[n][0]);
+		return levels[n];
 	}
 	
 	public void setScore(int level, int sc)
@@ -83,4 +93,10 @@ public class LevelManager {
 		savedscores.clear();
 	}
 	
+	public void dispose()
+	{
+		for (int i = 0; i < totalLevels; i++)
+			if (levels[i] != null)
+				levels[i].dispose();
+	}
 }
