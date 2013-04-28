@@ -15,7 +15,6 @@ public class ludum26entry extends Game {
 	SplashScreen splash;
 	MainScreen title;
 	AboutScreen about;
-	SelectScreen menu;
 	DivideScreen play;
 	
 	static AssetManager manager;
@@ -30,7 +29,6 @@ public class ludum26entry extends Game {
 		title = new MainScreen(this);
 		about = new AboutScreen(this);
 		play = new DivideScreen(this);
-		menu = new SelectScreen(this);
 		
 		queueAssets();
 		
@@ -51,6 +49,16 @@ public class ludum26entry extends Game {
 		manager.load("sawasdee.fnt", BitmapFont.class);
 		manager.load("Beaulieux.fnt", BitmapFont.class);
 		manager.load("Beaulieux-title.fnt", BitmapFont.class);
+		
+		
+		manager.load("about1.png", Texture.class);
+		manager.load("about2.png", Texture.class);
+		manager.load("about3.png", Texture.class);
+		manager.load("rightarrow.png", Texture.class);
+		manager.load("leftarrow.png", Texture.class);
+		manager.load("bottomarrow.png", Texture.class);
+		manager.load("toparrow.png", Texture.class);
+		
 		
 		// Loading levels
 		for (int i = 0; i < LevelManager.levelList.length; i++)

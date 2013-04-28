@@ -88,6 +88,7 @@ public class DivideScreen implements Screen {
 	float scoretimer; // timer for the alpha blend of the score images
 	static float SCORETIME = 0.2f;
 	
+	
 	public DivideScreen(ludum26entry game)
 	{
 		g = game;		
@@ -277,7 +278,7 @@ public class DivideScreen implements Screen {
 					{
 						nowDrawing = true;
 						dividingLine.clear();
-						drawingsnd.loop(0.2f);
+						//drawingsnd.loop(0.2f); FIXME: Find a better drawingsnd sound
 					}
 					if (dividingLine.size < MAXLINESIZE)
 						dividingLine.add(new Vector2(touchpos));					

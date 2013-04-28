@@ -26,7 +26,6 @@ public class MainScreen implements Screen {
 	SpriteBatch batch;
 	
 	boolean initdone = false;
-	boolean dofade = true;
 	
 	BitmapFont text;
 	Texture king;
@@ -147,6 +146,12 @@ public class MainScreen implements Screen {
 				{
 					leavescreen = true;
 					nextScreen = g.play;
+				}
+				
+				if (aboutbtnBox.contains(touchpos.x, touchpos.y))
+				{
+					leavescreen = true;
+					nextScreen = g.about;
 				}
 			}
 		}

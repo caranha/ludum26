@@ -1,6 +1,7 @@
 package org.castelodelego.ludum26;
 
 import java.util.Iterator;
+import java.util.Random;
 import java.util.Stack;
 
 import com.badlogic.gdx.Gdx;
@@ -20,6 +21,7 @@ import com.badlogic.gdx.utils.Array;
 public class PuzzleImage {
 	
 	private static int[][] dir = {{1,0},{0,1},{-1,0},{0,-1}};	
+	Random dice;
 
 	Pixmap flood;
 	Pixmap orig;
@@ -50,6 +52,7 @@ public class PuzzleImage {
 	public PuzzleImage(String name)
 	{
 		orig = ludum26entry.manager.get(name, Pixmap.class); // static call!
+		dice = new Random();
 				
 		W = orig.getWidth();
 		H = orig.getHeight();
@@ -135,11 +138,13 @@ public class PuzzleImage {
 							colorcount[i][1] += 1;
 							flood.drawPixel(cur.x, cur.y,BlueColor);
 						}
-															
+					
+				int tt = dice.nextInt(4);
 				// Put pixels around this one in the stack
 				for (int i = 0; i < 4; i++)
 				{
-					t = new Point(cur.x + dir[i][0], cur.y+dir[i][1]);
+					
+					t = new Point(cur.x + dir[(i+tt)%4][0], cur.y+dir[(i+tt)%4][1]);
 					if ((t.x >= 0 && t.x < W && t.y >=0 && t.y < H) && (!visited[t.x][t.y]))
 					{ // valid and not visited point
 						visited[t.x][t.y] = true;
