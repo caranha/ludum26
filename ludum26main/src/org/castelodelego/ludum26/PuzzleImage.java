@@ -19,29 +19,30 @@ import com.badlogic.gdx.utils.Array;
  */
 public class PuzzleImage {
 	
-	static int[][] dir = {{1,0},{0,1},{-1,0},{0,-1}};	
+	private static int[][] dir = {{1,0},{0,1},{-1,0},{0,-1}};	
 
 	Pixmap flood;
 	Pixmap orig;
-
 	
 	int H, W;
 	
 	// Colors for this puzzle Image
 	static int lineColor = Color.rgba8888(0f,0f,0f,1f); // black
-
 	static int RedColor = Color.rgba8888(1f,0f,0f,0.7f); // red
 	static int BlueColor = Color.rgba8888(0f,0f,1f,0.7f); // blue
-	boolean paintingRed; // which colors we are painting now
+	private boolean paintingRed; // which colors we are painting now
 	
-	int colortable[];
+	public int colortable[];
 	int colorcount[][];
 	
-	Array<Point> divLine;
-
-	boolean[][] visited;
-	Stack<Point> currStack;
-	Stack<Point> nextStack;
+	public float scorecolor[];
+	public float redbluescore;
+	public int score;
+	
+	private Array<Point> divLine;
+	private boolean[][] visited;
+	private Stack<Point> currStack;
+	private Stack<Point> nextStack;
 	
 	/**
 	 * Default Constructor, uses pre-set images and colors
@@ -63,6 +64,7 @@ public class PuzzleImage {
 		
 		colortable = new int[ncolor];
 		colorcount = new int[ncolor][2];
+		scorecolor = new float[ncolor];
 		
 		for (int i = 0; i < ncolor; i++) // setting the relevant colors
 		{
@@ -76,7 +78,9 @@ public class PuzzleImage {
 		reset();		
 	}
 	
-	// Resets the puzzle to be played again;
+	/** 
+	 * Resets the puzzle to be played again;
+	 */
 	public void reset()
 	{
 		flood.setColor(0, 0, 0, 0);
@@ -91,6 +95,10 @@ public class PuzzleImage {
 		currStack.push(new Point(0,0)); // adding the initial point
 		visited[0][0] = true;
 		paintingRed = true;
+		
+		scorecolor = new float[scorecolor.length];
+		redbluescore = 0.5f;
+		score = 0;
 	}
 	
 	/**
@@ -150,15 +158,55 @@ public class PuzzleImage {
 			currStack = nextStack;
 			nextStack = new Stack<Point>();
 		}
-		
-		for (int i = 0; i < colortable.length; i++)
-			Gdx.app.log("PuzzleScore", "Color "+i+": " + ((colorcount[i][0]*1.0)/(colorcount[i][0]+colorcount[i][1])));		
-
 		return true;
 	}
 	
+	/**
+	 * Sets three public values:
+	 * Score (0-3)
+	 * redbluescore (who is bigger between red and blue)
+	 * scorecolor (score per color)
+	 */
+	public void setScore()
+	{
+		if (colorcount[0][0] == 0 && colorcount[0][1] == 0)
+			return;
+
+		float maxunbalance = 0;
+		int unbalanceindex = 0;
+		int currentgrade = 3;
+
+		float[] divisions = new float[colorcount.length];
+		for (int i = 0; i < divisions.length; i++)
+		{
+			divisions[i] = (colorcount[i][0]*1f)/(colorcount[i][0]+colorcount[i][1]);
+			float unbalance = (float) Math.abs(divisions[i]-0.5);
+			Gdx.app.log("Score", "Score Color " +i + ": " + divisions[i]);
+			
+			scorecolor[i] = divisions[i];
+			if (unbalance > maxunbalance)
+			{
+				maxunbalance = unbalance;
+				unbalanceindex = i;
+			}
+			
+			if (currentgrade > 2 && unbalance > 0.01)
+				currentgrade = 2;
+			if (currentgrade > 1 && unbalance > 0.025)
+				currentgrade = 1;
+			if (currentgrade > 0 && unbalance > 0.05)
+				currentgrade = 0;
+		}
+		redbluescore = divisions[unbalanceindex];
+		score = currentgrade;
+		Gdx.app.log("Score", "Total Score: " + score +", Max unbalance: "+ redbluescore);
+	}
 	
-	// Sets the Div Line
+	/**
+	 *  Sets the Div Line
+	 * @param line
+	 * @param offset
+	 */
 	public void setLine(Array<Vector2> line, Vector2 offset)
 	{
 		Iterator<Vector2> it = line.iterator();
@@ -173,7 +221,10 @@ public class PuzzleImage {
 		}
 	}
 
-	// Draws the Div Line in a certain color
+	/**
+	 *  Draws the Div Line in a certain color
+	 * @param c
+	 */
 	public void drawDivLine(Color c)
 	{
 		Point P1,P2 = null;

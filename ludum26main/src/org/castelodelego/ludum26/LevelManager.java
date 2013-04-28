@@ -10,7 +10,20 @@ public class LevelManager {
 	// Include all level filenames here, 
 	static String[][] levelList = { 
 			{ "levels/level0.png", "In the Beginning" },
-			{ "levels/testlevel.png", "Prototyping" }			
+			{ "levels/level1.png", "A Decision" },
+			{ "levels/level2.png", "Perspective" },
+			{ "levels/level3.png", "Planets" },
+			{ "levels/level4.png", "Snake" },
+			{ "levels/level5.png", "Settlers" },
+			{ "levels/level6.png", "Art" },
+			{ "levels/level7.png", "The Commons" },
+			{ "levels/level8.png", "The Cave" },
+			{ "levels/level9.png", "Festival" },
+			{ "levels/level10.png", "Night Forest" },
+			{ "levels/level11.png", "Loving You" },
+			{ "levels/level12.png", "Party" },
+			{ "levels/level13.png", "Emotions" },
+			{ "levels/level14.png", "Challenge" }
 	};
 	
 	
@@ -46,9 +59,15 @@ public class LevelManager {
 		if (score[level] < sc)
 		{
 			score[level] = sc;
+			savedscores.putInteger("score"+level, sc);
 			
+			//FIXME: unlock more levels on higher scores
 			if (level+1 < totalLevels)
-			unlocked[level+1] = true;
+			{
+				Gdx.app.log("levelManager", "New High Score!");
+				unlocked[level+1] = true;
+				savedscores.putBoolean("unlocked"+(level+1), true);
+			}
 		}		
 	}
 	// TODO: make later levels only unlock if you have a number of A's

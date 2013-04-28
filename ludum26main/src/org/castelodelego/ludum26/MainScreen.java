@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont.HAlignment;
 import com.badlogic.gdx.graphics.g2d.BitmapFontCache;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 
 public class MainScreen implements Screen {
 
@@ -24,13 +25,24 @@ public class MainScreen implements Screen {
 	boolean dofade = true;
 	
 	BitmapFont text;
-	BitmapFont title;
 	Texture king;
 	
 	BitmapFontCache titletext;
 	BitmapFontCache playbtn;
 	BitmapFontCache aboutbtn;
 	BitmapFontCache ld26text;
+	
+	
+	static float FADE_T = 0.2f; 
+	static final int S_FADEIN = 0;
+	static final int S_FADEOUT = 2;
+	static final int S_NORMAL = 1;
+	int currSTATE;
+	float fadestate;
+	
+	boolean leavescreen;
+	Screen nextScreen;
+	
 	
 	public MainScreen(ludum26entry game)
 	{
@@ -46,14 +58,13 @@ public class MainScreen implements Screen {
 	{
 		Gdx.app.log("MainScreen", "initialized");
 		// loading textures
-		king = g.manager.get("fairking.png", Texture.class);
+		king = ludum26entry.manager.get("fairking.png", Texture.class);
 		
-		//title = g.manager.get("Beaulieux.fnt", BitmapFont.class);
-		titletext = new BitmapFontCache(g.manager.get("Beaulieux.fnt", BitmapFont.class),true);
-		titletext.addText("The Fair King", 310, 430);
+		titletext = new BitmapFontCache(ludum26entry.manager.get("Beaulieux-title.fnt", BitmapFont.class),true);
+		titletext.addText("The Fair Kingo", 325, 430);
 		titletext.setColor(Color.DARK_GRAY);
 		
-		text = g.manager.get("sawasdee.fnt", BitmapFont.class);
+		text = ludum26entry.manager.get("sawasdee.fnt", BitmapFont.class);
 		playbtn = new BitmapFontCache(text,true);
 		aboutbtn = new BitmapFontCache(text,true);
 		ld26text = new BitmapFontCache(text,true);
@@ -75,10 +86,9 @@ public class MainScreen implements Screen {
 		Gdx.gl.glClearColor(1, 1, 1, 1); // clearing the screen
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
-		
+		// Drawing Sprites
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
-		//batch.setColor(1f, 1f, 1f, 1f);
 		batch.draw(king, 0, 0);
 
 		// drawing text
@@ -86,12 +96,54 @@ public class MainScreen implements Screen {
 		playbtn.draw(batch);
 		aboutbtn.draw(batch);
 		ld26text.draw(batch);
-		
-		
 		batch.end();
+
 		
-		if(Gdx.input.isTouched())
-			g.setScreen(g.play);
+		// Drawing Fade
+		if (currSTATE == S_FADEIN || currSTATE == S_FADEOUT) 
+		{
+			Gdx.gl.glEnable(GL20.GL_BLEND);
+			Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+			lineDrawer.setProjectionMatrix(camera.combined);
+			lineDrawer.begin(ShapeType.FilledRectangle);
+			lineDrawer.setColor(1f, 1f, 1f, 1 - (fadestate/FADE_T));
+			// FIXME: Do I need to specify changing sides here, or does the camera takes care of this for me?
+			// What does the above mean??
+			lineDrawer.filledRect(0, 0, 800, 480);		
+			lineDrawer.end();
+		}
+		// End Drawing Fade
+		
+		
+		/*** INPUT ***/
+		if (currSTATE == S_NORMAL) // IGNORE INPUT DURING FADE_IN/OUT
+		{
+			if(Gdx.input.isTouched())
+			{
+				leavescreen = true;
+				nextScreen = g.play;
+			}
+		}
+		
+		/*** UPDATES ***/
+		//Gdx.app.debug("statemachine", "state: " + currSTATE + " fadestate: " + fadestate/FADE_T + " Delta: " + delta);
+		switch(currSTATE)
+		{
+		case S_FADEIN:
+			fadestate += delta;
+			if (fadestate/FADE_T >= 1)
+				currSTATE = S_NORMAL;
+			break;
+		case S_FADEOUT:
+			fadestate -= delta;
+			if (fadestate/FADE_T <= 0)
+				g.setScreen(nextScreen);
+			break;
+		case S_NORMAL:
+			if (leavescreen)
+				currSTATE = S_FADEOUT;
+			break;
+		}
 				
 	}
 
@@ -105,8 +157,11 @@ public class MainScreen implements Screen {
 	public void show() {
 		if (initdone == false)
 			init();
-		dofade = true;
+		Gdx.app.log("transition", "Entered Main Screen");
 
+		currSTATE = S_FADEIN;
+		fadestate = 0;
+		leavescreen = false;
 		
 	}
 

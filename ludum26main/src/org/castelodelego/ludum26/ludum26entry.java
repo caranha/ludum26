@@ -48,6 +48,7 @@ public class ludum26entry extends Game {
 		manager.load("fairking.png", Texture.class);
 		manager.load("sawasdee.fnt", BitmapFont.class);
 		manager.load("Beaulieux.fnt", BitmapFont.class);
+		manager.load("Beaulieux-title.fnt", BitmapFont.class);
 		
 		// Loading levels
 		for (int i = 0; i < LevelManager.levelList.length; i++)
