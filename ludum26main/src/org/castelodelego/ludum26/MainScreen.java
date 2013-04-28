@@ -29,6 +29,7 @@ public class MainScreen implements Screen {
 	
 	BitmapFont text;
 	Texture king;
+	Texture kingest;
 	
 	BitmapFontCache titletext;
 
@@ -39,6 +40,8 @@ public class MainScreen implements Screen {
 	Rectangle aboutbtnBox;
 	
 	BitmapFontCache ld26text;
+	SelectBox menu;
+	Boolean master = false;
 	
 	Music mainmusic; // FIXME: no idea where to put this;
 	
@@ -49,6 +52,11 @@ public class MainScreen implements Screen {
 	static final int S_NORMAL = 1;
 	int currSTATE;
 	float fadestate;
+	
+	static final int SS_main = 0;
+	static final int SS_select = 1;
+	int substate;
+	
 	
 	boolean leavescreen;
 	Screen nextScreen;
@@ -69,6 +77,7 @@ public class MainScreen implements Screen {
 		Gdx.app.log("MainScreen", "initialized");
 		// loading textures
 		king = ludum26entry.manager.get("fairking.png", Texture.class);
+		kingest = ludum26entry.manager.get("fairking2.png", Texture.class);
 		
 		titletext = new BitmapFontCache(ludum26entry.manager.get("Beaulieux-title.fnt", BitmapFont.class),true);
 		titletext.addText("The Fair Kingo", 325, 430);
@@ -95,6 +104,8 @@ public class MainScreen implements Screen {
 		aboutbtn.setColor(Color.DARK_GRAY);
 		ld26text.setColor(Color.DARK_GRAY);
 		
+		menu = new SelectBox(335,16,450,450);
+		
 		initdone = true;
 	}
 	
@@ -107,15 +118,28 @@ public class MainScreen implements Screen {
 		// Drawing Sprites
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
-		batch.draw(king, 0, 0);
-
-		// drawing text
-		titletext.draw(batch);
-		playbtn.draw(batch);
-		aboutbtn.draw(batch);
-		ld26text.draw(batch);
+		batch.setColor(1, 1, 1,1f);
+		if (!master)	
+			batch.draw(king, 0, 0);
+		else
+			batch.draw(kingest,0,0);
 		batch.end();
 
+		// drawing text
+		switch(substate)
+		{
+		case SS_main:
+			batch.begin();
+			titletext.draw(batch);
+			playbtn.draw(batch);
+			aboutbtn.draw(batch);
+			ld26text.draw(batch);
+			batch.end();
+		break;
+		case SS_select:
+			menu.Render(camera, lineDrawer, batch);
+			break;
+		}
 		
 		// Drawing Fade
 		if (currSTATE == S_FADEIN || currSTATE == S_FADEOUT) 
@@ -136,22 +160,35 @@ public class MainScreen implements Screen {
 		/*** INPUT ***/
 		if (currSTATE == S_NORMAL) // IGNORE INPUT DURING FADE_IN/OUT
 		{
-			if(Gdx.input.isTouched())
+			if(Gdx.input.justTouched())
 			{
 				Vector3 rawtouch = new Vector3(Gdx.input.getX(), Gdx.input.getY(),0);
 				camera.unproject(rawtouch);
 				Vector2 touchpos = new Vector2(rawtouch.x, rawtouch.y);
 				
-				if (playbtnBox.contains(touchpos.x, touchpos.y))
+				switch (substate)
 				{
-					leavescreen = true;
-					nextScreen = g.play;
-				}
-				
-				if (aboutbtnBox.contains(touchpos.x, touchpos.y))
-				{
-					leavescreen = true;
-					nextScreen = g.about;
+				case SS_main:
+					if (playbtnBox.contains(touchpos.x, touchpos.y))
+					{
+						menu.start(g.lmanager);
+						substate = SS_select;
+					}
+					if (aboutbtnBox.contains(touchpos.x, touchpos.y))
+					{
+						leavescreen = true;
+						nextScreen = g.about;
+					}
+					break;
+				case SS_select:
+					int ret = menu.catchClick(touchpos.x, touchpos.y);
+					if (ret != -1)
+					{
+						leavescreen = true;
+						nextScreen = g.play;
+						g.play.curLevel = ret;
+					}
+					break;
 				}
 			}
 		}
@@ -173,6 +210,8 @@ public class MainScreen implements Screen {
 		case S_NORMAL:
 			if (leavescreen)
 				currSTATE = S_FADEOUT;
+			if (substate == SS_select)
+				menu.update(delta);
 			break;
 		}
 				
@@ -197,6 +236,10 @@ public class MainScreen implements Screen {
 		currSTATE = S_FADEIN;
 		fadestate = 0;
 		leavescreen = false;
+		
+		substate = SS_main;
+		
+		master = g.lmanager.perfectScore();
 		
 	}
 

@@ -35,7 +35,7 @@ public class ludum26entry extends Game {
 		lmanager = new LevelManager();
 		lmanager.loadLevelData();
 		
-		Gdx.app.setLogLevel(Application.LOG_DEBUG);
+		Gdx.app.setLogLevel(Application.LOG_NONE);
 		setScreen(splash); 
 	
 	}
@@ -46,6 +46,8 @@ public class ludum26entry extends Game {
 		
 		// Loading images
 		manager.load("fairking.png", Texture.class);
+		manager.load("fairking2.png", Texture.class);
+		
 		manager.load("sawasdee.fnt", BitmapFont.class);
 		manager.load("Beaulieux.fnt", BitmapFont.class);
 		manager.load("Beaulieux-title.fnt", BitmapFont.class);

@@ -23,7 +23,10 @@ public class LevelManager {
 			{ "levels/level11.png", "Loving You" },
 			{ "levels/level12.png", "Party" },
 			{ "levels/level13.png", "Emotions" },
-			{ "levels/level14.png", "Challenge" }
+			{ "levels/level14.png", "Challenge" },
+			{ "levels/level14.png", "Strength" },
+			{ "levels/level14.png", "Passion" },
+			{ "levels/level14.png", "Final Revenge" }
 	};
 	
 	
@@ -61,18 +64,31 @@ public class LevelManager {
 			score[level] = sc;
 			savedscores.putInteger("score"+level, sc);
 			
-			//FIXME: unlock more levels on higher scores
 			if (level+1 < totalLevels)
 			{
 				Gdx.app.log("levelManager", "New High Score!");
 				unlocked[level+1] = true;
 				savedscores.putBoolean("unlocked"+(level+1), true);
 			}
-		}		
+			
+			if (sc == 3)
+				unlockExtra();
+		}
+		savedscores.flush();
 	}
-	// TODO: make later levels only unlock if you have a number of A's
-	// But to do this, I must make it clear somewhere that this is the case 
-	// ("A's necessary for this level: X)
+	
+	public void unlockExtra()
+	{
+		int l = 0;
+		while (l < totalLevels && unlocked[l])
+			l++;
+		if (l < totalLevels)
+		{
+			unlocked[l] = true;
+			savedscores.putBoolean("unlocked"+l, true);
+		}
+	}
+
 	
 	public int getNext(int n)
 	{
@@ -85,13 +101,21 @@ public class LevelManager {
 			return n;
 	}
 	
-	public void saveLevelData()
+	public boolean perfectScore()
 	{
 		for (int i = 0; i < totalLevels; i++)
-		{
-			savedscores.putBoolean("unlocked"+i, unlocked[i]);
-			savedscores.putInteger("score"+i, score[i]);
-		}
+			if (score[i] < 3)
+				return false;
+		return true;
+	}
+	
+	public int getTotalUnlocked()
+	{
+		int ret = 0;
+		while (ret < totalLevels && unlocked[ret] == true)
+			ret++;
+		
+		return ret;			
 	}
 	
 	public void loadLevelData()

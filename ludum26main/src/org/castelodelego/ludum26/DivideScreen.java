@@ -103,6 +103,7 @@ public class DivideScreen implements Screen {
 		batch = new SpriteBatch();
 		
 		initialized = false;
+		curLevel = 0;
 	}
 	
 	public void init()
@@ -111,9 +112,6 @@ public class DivideScreen implements Screen {
 		{
 			Gdx.app.log("DivideScreen","initialized");
 			curState = STATE_FADEIN;
-			curLevel = 0;
-			
-
 			
 			dividingLine.clear();
 			
