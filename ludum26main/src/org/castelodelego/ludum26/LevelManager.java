@@ -24,9 +24,9 @@ public class LevelManager {
 			{ "levels/level12.png", "Party" },
 			{ "levels/level13.png", "Emotions" },
 			{ "levels/level14.png", "Challenge" },
-			{ "levels/level14.png", "Strength" },
-			{ "levels/level14.png", "Passion" },
-			{ "levels/level14.png", "Final Revenge" }
+			{ "levels/level15.png", "Strength" },
+			{ "levels/level16.png", "Passion" },
+			{ "levels/level17.png", "Final Revenge" }
 	};
 	
 	
