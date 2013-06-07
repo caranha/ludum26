@@ -33,8 +33,9 @@ public class LevelManager {
 	int totalLevels;
 	PuzzleImage[] levels;
 	
-	public boolean[] unlocked;
+	// public boolean[] unlocked;
 	public int[] score;
+	int unlockindex;
 	Preferences savedscores;
 	
 	public LevelManager()
@@ -42,8 +43,9 @@ public class LevelManager {
 		totalLevels = levelList.length;
 		savedscores = Gdx.app.getPreferences("Scores");
 		
-		unlocked = new boolean[totalLevels];
-		unlocked[0] = true;
+//		unlocked = new boolean[totalLevels];
+//		unlocked[0] = true;
+		unlockindex = 0;
 		
 		levels = new PuzzleImage[totalLevels];
 		
@@ -57,48 +59,49 @@ public class LevelManager {
 		return levels[n];
 	}
 	
-	public void setScore(int level, int sc)
+	/**
+	 * Register a new score for a level and, if appropriate, unlocks new levels. 
+	 * Returns whether new levels were unlocked or not.
+	 * 
+	 * @param level The level for which a score is being submitted.
+	 * @param sc 0->D 3->A
+	 */
+	public boolean setScore(int level, int sc)
 	{
-		if (score[level] < sc)
-		{
-			score[level] = sc;
-			savedscores.putInteger("score"+level, sc);
-			
-			if (level+1 < totalLevels)
-			{
-				Gdx.app.log("levelManager", "New High Score!");
-				unlocked[level+1] = true;
-				savedscores.putBoolean("unlocked"+(level+1), true);
-			}
-			
-			if (sc == 3)
-				unlockExtra();
-		}
-		savedscores.flush();
-	}
-	
-	public void unlockExtra()
-	{
-		int l = 0;
-		while (l < totalLevels && unlocked[l])
-			l++;
-		if (l < totalLevels)
-		{
-			unlocked[l] = true;
-			savedscores.putBoolean("unlocked"+l, true);
-		}
-	}
+		int oldunlock = unlockindex;
+		
+		if (score[level] == 0 && sc > 0) // new non-zero score
+			unlockindex++;
+		if (score[level] != 3 && sc == 3) // new "A" score
+			unlockindex++;
 
+		if (unlockindex >= totalLevels)
+			unlockindex = totalLevels-1; // unlockindex is limited by the level array length
+		
+		if (score[level] < sc)
+			score[level] = sc; // update score if necessary
+		
+		// update preferences
+		savedscores.putInteger("score"+level, score[level]);
+		savedscores.putInteger("unlockindex", unlockindex);
+		savedscores.flush();
+		
+		return (oldunlock != unlockindex); // new levels were unlocked
+	}
 	
+	/**
+	 * Return what is the next level when this level is completed -- ignores whether this level was successfully 
+	 * completed or not, and only checks if the next level is available (checks for level limits, or unluck limits)
+	 * 
+	 * @param n Level that was just completed
+	 * @return Level that should be played next, or -1 if N was the last level.
+	 */
 	public int getNext(int n)
 	{
 		if (n == totalLevels-1)
 			return -1;
-		
-		if (unlocked[n+1])
-			return n+1;
-		else 
-			return n;
+	
+		return (Math.min(n+1, unlockindex));		
 	}
 	
 	public boolean perfectScore()
@@ -109,29 +112,27 @@ public class LevelManager {
 		return true;
 	}
 	
+	/**
+	 * Return the total number of levels unlocked;
+	 * @return
+	 */
 	public int getTotalUnlocked()
 	{
-		int ret = 0;
-		while (ret < totalLevels && unlocked[ret] == true)
-			ret++;
-		
-		return ret;			
+		return unlockindex+1;			
 	}
 	
 	public void loadLevelData()
 	{
 		for (int i = 0; i < totalLevels; i++)
 		{
-			unlocked[i] = savedscores.getBoolean("unlocked"+i, false);
+			unlockindex = savedscores.getInteger("unlockindex",0);
 			score[i] = savedscores.getInteger("score"+i, 0);
 		}
-		unlocked[0] = true;
 	}
 	
 	public void resetLevelData()
 	{
-		unlocked = new boolean[totalLevels];
-		unlocked[0] = true;		
+		unlockindex = 0;
 		score = new int[totalLevels];
 		savedscores.clear();
 	}
@@ -142,4 +143,15 @@ public class LevelManager {
 			if (levels[i] != null)
 				levels[i].dispose();
 	}
+	
+	/**
+	 * Returns true if the level l is unlocked. False if it is not unlocked.
+	 * @param l
+	 * @return
+	 */
+	public boolean isLevelUnlocked(int l)
+	{
+		return (l <= unlockindex);
+	}
+	
 }
