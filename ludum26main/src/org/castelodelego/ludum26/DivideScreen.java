@@ -250,7 +250,7 @@ public class DivideScreen implements Screen {
 		
 		/*** INPUT BLOCK ***/
 				
-		if(wastouched = Gdx.input.isTouched()) // Cnam style!
+		if(wastouched == Gdx.input.isTouched()) // Cnam style!
 		{			
 			rawtouch.set(Gdx.input.getX(), Gdx.input.getY(),0);
 			camera.unproject(rawtouch);
