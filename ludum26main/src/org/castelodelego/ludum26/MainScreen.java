@@ -182,7 +182,7 @@ public class MainScreen implements Screen {
 					break;
 				case SS_select:
 					int ret = menu.catchClick(touchpos.x, touchpos.y);
-					if (ret != -1)
+					if (ret != -1 && g.lmanager.unlocked[ret])
 					{
 						leavescreen = true;
 						nextScreen = g.play;

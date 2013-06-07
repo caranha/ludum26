@@ -2,46 +2,45 @@ Ludum Dare 26 -- The Fair King
 
 * Description
 
-This project is a game that was originally released for the Ludum Dare 26 game Jam. 
-The original release of the game can be checked here:
+This project is a game that was originally released for the Ludum Dare
+26 game Jam.  The original release of the game can be checked here:
 
 http://www.ludumdare.com/compo/ludum-dare-26/?action=preview&uid=7847
 
-The goal of the game is divide each of the screens so that each color (except black 
-and white) is equally distributed between the divisions. 
+The goal of the game is divide each of the screens so that each color
+(except black and white) is equally distributed between the divisions.
 
-The game uses the libGDX java library, and it is available for Desktop and Android.
-
+The game uses the libGDX java library, and it is available for Desktop
+and Android.
 
 * Goals
 
-My general goal for this project is to remove most of the interface bugs and 
-unintuitive behavior by the end of the month. If possible, I would also like to
-improve the look of the game on Android a bit - it looks too washed out.
-
+My general goal for this project is to remove most of the interface
+bugs and unintuitive behavior by the end of the month. If possible, I
+would also like to improve the look of the game on Android a bit - it
+looks too washed out.
 
 * Task List
-
 ** Improve stage selection logic
-	- Rework the logic for opening new stages;
-	- Remove the "click invisible stage" bug;
+- [X] Remove the "click invisible stage" bug;
+- [ ] Rework the logic for opening new stages;
 	
 ** Improve game interface
-	- Remove drawing timeout OR add timeout indicator;
-	- Game detects an incomplete line and cancel the line;
-	- Game detects an "almost complete" line, and completes that line;
+- [ ] Remove drawing timeout OR add timeout indicator;
+- [ ] Game detects an incomplete line and cancel the line;
+- [ ] Game detects an "almost complete" line, and completes that line;
 
 ** Make game easier to understand
-	- Move level 6 later into the game;
-	- Add a "Level Unlocked" message;
-	- Improve the tutorial screens;
-	- Add some in-game explanation messages;
+- [ ] Move level 6 later into the game;
+- [ ] Add a "Level Unlocked" message;
+- [ ] Improve the tutorial screens;
+- [ ] Add some in-game explanation messages;
 	
 ** General Polish;
- 	- Make the level selection screen easier to navigate;
- 	- Make the game look less washed out on Android;
- 	- Make buttons hit boxes larger;
- 	- Add some sort of marking for getting "A"s?
-
+- [ ] Make the level selection screen easier to navigate;
+- [ ] Make the game look less washed out on Android;
+- [ ] Make buttons hit boxes larger;
+- [ ] Add some sort of marking for getting "A"s?
+  
 ** Other;
-	- Add to Play Store.
+- [ ] Add to Play Store.
