@@ -1,7 +1,7 @@
-/JavaGameTest
-/LibGDXGaming
-/LudumDareSample*
-/pyTest
-/testgdxgame*
-/.metadata
 *.class
+*~
+
+# Package Files #
+*.jar
+*.war
+*.ear
