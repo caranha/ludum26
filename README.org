@@ -42,6 +42,24 @@ looks too washed out.
 - [ ] Game detects an incomplete line and cancel the line;
 - [ ] Game detects an "almost complete" line, and completes that line;
 
+*** LineInput object
+- clear() // clears the line
+- drawCurrent() // draws the current line to the screen
+
+- isLineValid() // Tests whether the line is connected to the borders,
+  or has an internal circle
+
+- getLine() // gets the line to send to the divide logic
+
+- input ("X,Y") // (possibly) inserts a new x,y into 
+the line (checks if the X,Y is far enough)
+
+- finish() // indicates that the line is over. Here we try 
+to tie the ends of the line to the border os the screen.
+
+- float bordersnap; // distance that the ends of the line snap to the
+  border
+
 ** TODO Make game easier to understand
 - [ ] Move level 6 later into the game;
 - [ ] Add a "Level Unlocked" message;
