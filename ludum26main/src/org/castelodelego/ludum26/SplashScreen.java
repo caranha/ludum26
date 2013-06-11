@@ -48,8 +48,8 @@ public class SplashScreen implements Screen {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		
-		loaddone = g.manager.update();		
-		loadprogress = g.manager.getProgress();
+		loaddone = ludum26entry.manager.update();		
+		loadprogress = ludum26entry.manager.getProgress();
 
 		// splash screen fade crontrol
 		time = time+delta;		
@@ -76,8 +76,6 @@ public class SplashScreen implements Screen {
 				lineDrawer.setProjectionMatrix(camera.combined);
 				lineDrawer.begin(ShapeType.FilledRectangle);
 				lineDrawer.setColor(1f, 1f, 1f, 1-fade);
-				// FIXME: Do I need to specify changing sides here, or does the camera takes care of this for me?
-				// What does the above mean??
 				lineDrawer.filledRect(0, 0, 800, 480);		
 				lineDrawer.end();
 			}

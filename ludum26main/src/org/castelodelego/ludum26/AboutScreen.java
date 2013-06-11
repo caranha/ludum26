@@ -106,8 +106,6 @@ public class AboutScreen implements Screen {
 			lineDrawer.setProjectionMatrix(camera.combined);
 			lineDrawer.begin(ShapeType.FilledRectangle);
 			lineDrawer.setColor(1f, 1f, 1f, 1 - (fadestate/FADE_T));
-			// FIXME: Do I need to specify changing sides here, or does the camera takes care of this for me?
-			// What does the above mean??
 			lineDrawer.filledRect(0, 0, 800, 480);		
 			lineDrawer.end();
 		}

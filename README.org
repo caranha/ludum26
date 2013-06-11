@@ -38,8 +38,9 @@ looks too washed out.
     "isStageUnlocked()".
 
 ** TODO Improve game interface
-- [ ] Remove drawing timeout OR add timeout indicator;
-- [ ] Game detects an incomplete line and cancel the line;
+- [X] Move "line" to a separate class (same behavior)
+- [X] Remove drawing timeout OR add timeout indicator; -- apparently, I can deal with pretty long lines
+- [X] Game detects an incomplete line and cancel the line;
 - [ ] Game detects an "almost complete" line, and completes that line;
 
 *** LineInput object

@@ -1,8 +1,5 @@
 package org.castelodelego.ludum26;
 
-import java.util.Iterator;
-
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Sound;
@@ -20,7 +17,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.Array;
 
 /***
  * Main game class. In this screen, the player is presented with a puzzle (an image), 
@@ -30,9 +26,7 @@ import com.badlogic.gdx.utils.Array;
  */
 
 public class DivideScreen implements Screen {
-	
-	static int MAXLINESIZE = 500;
-	
+		
 	boolean initialized;
 	boolean startflood;
 	//float timeaccum;
@@ -47,7 +41,9 @@ public class DivideScreen implements Screen {
 	ShapeRenderer lineDrawer;
 	SpriteBatch batch;
 	
-	Array<Vector2> dividingLine; // This array contains the Line created by the player
+	LineInput divline;
+	
+	
 	boolean nowDrawing; // Turns to true when the player starts drawing, and false when he stops
 
 	PuzzleImage puzzle;
@@ -95,7 +91,8 @@ public class DivideScreen implements Screen {
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 800, 480);
 		
-		dividingLine = new Array<Vector2>();
+		divline = new LineInput();
+		
 		rawtouch = new Vector3();
 		touchpos = new Vector2();
 		
@@ -113,7 +110,7 @@ public class DivideScreen implements Screen {
 			Gdx.app.log("DivideScreen","initialized");
 			curState = STATE_FADEIN;
 			
-			dividingLine.clear();
+			divline.clear();
 			
 			returnButton = new BitmapFontCache(ludum26entry.manager.get("sawasdee.fnt", BitmapFont.class),true);
 			titleText = new BitmapFontCache(ludum26entry.manager.get("sawasdee.fnt", BitmapFont.class),true);
@@ -169,7 +166,7 @@ public class DivideScreen implements Screen {
 		fadestate = 0;
 		scoretimer = 0;
 		
-		dividingLine.clear();
+		divline.clear();
 		wastouched = false;
 
 		leaveScreen = false;
@@ -212,25 +209,8 @@ public class DivideScreen implements Screen {
 		lineDrawer.rect(puzzlepos.x, puzzlepos.y, 700, 380);
 		lineDrawer.end();
 		
-		// Drawing INPUT LINE
-		if (dividingLine.size > 0)
-		{
-			lineDrawer.setProjectionMatrix(camera.combined);
-			lineDrawer.begin(ShapeType.Line);
-			lineDrawer.setColor(1, 0, 0, 1);
-
-			Vector2 P1, P2 = null;
-			Iterator<Vector2> it = dividingLine.iterator();
-			
-			while (it.hasNext())
-			{
-				P1 = it.next();
-				if (P2 != null)
-					lineDrawer.line(P2.x, P2.y, P1.x, P1.y);
-				P2 = P1;
-			}
-			lineDrawer.end();
-		}
+		// Drawing the line
+		divline.drawCurrent(camera);
 
 		// Score drawing
 		if (scoretimer > 0)
@@ -252,6 +232,7 @@ public class DivideScreen implements Screen {
 				
 		if(wastouched = Gdx.input.isTouched()) // Cnam style!
 		{			
+			//Black magic!
 			rawtouch.set(Gdx.input.getX(), Gdx.input.getY(),0);
 			camera.unproject(rawtouch);
 			touchpos.set(rawtouch.x, rawtouch.y);
@@ -260,7 +241,7 @@ public class DivideScreen implements Screen {
 			
 		if (wastouched && curState != STATE_FADEIN && curState != STATE_FADEOUT)
 		{
-			// THIS ALWAYS HAPPENS -- except when dr
+			// THIS ALWAYS HAPPENS except while drawing
 			if (returnButtonBox.contains(touchpos.x, touchpos.y) && !nowDrawing)
 			{
 				Gdx.app.debug("touchtest", "Touched Return Button");
@@ -275,16 +256,13 @@ public class DivideScreen implements Screen {
 					if (!nowDrawing) // Creating a new Line
 					{
 						nowDrawing = true;
-						dividingLine.clear();
+						divline.clear();
 						//drawingsnd.loop(0.2f); FIXME: Find a better drawingsnd sound
 					}
-					if (dividingLine.size < MAXLINESIZE)
-						dividingLine.add(new Vector2(touchpos));					
+					divline.addInput(new Vector2(touchpos)); //TODO: Maybe deal with the line being impossible to draw?
 					break;
 				case STATE_WAIT:
-					// FIXME: Remember to set up the next level at the UPDATE
 					leaveScreen = true;
-					// nextScreen = g.play; -- possibly not needed
 					break;
 				}
 			}
@@ -294,15 +272,19 @@ public class DivideScreen implements Screen {
 		{
 			puzzle.reset(); // TODO -- this shouldn't be needed, if we do it once per screen call
 			Gdx.app.log("input:play","stopped drawing");
-			
-			// This probably should go to UPDATE
-			puzzle.setLine(dividingLine, puzzlepos);
-			puzzle.drawDivLine(Color.BLACK);
-			dividingLine.clear();
 
+			divline.finish();
+			if (divline.isValid())
+			{
+				puzzle.setLine(divline.getDivLine(), puzzlepos);
+				puzzle.drawDivLine(Color.BLACK);
+				startflood = true; // SIGNAL TO CHANGE THE STATE TO STATE_CALCULATE
+			}
+
+			divline.clear();
 			nowDrawing = false;
-			drawingsnd.stop();
-			startflood = true; // SIGNAL TO CHANGE THE STATE TO STATE_CALCULATE
+			// drawingsnd.stop();
+
 		}
 		
 
