@@ -18,9 +18,8 @@ import com.badlogic.gdx.utils.Array;
  */
 public class LineInput {
 	
-	static double bordersnap = 5; //How close the line has to be to the border before it will snap into it.
-	static double segmentdelta = 2; // what is the minimum distance that characterizes a new segment?
-	static double angledelta = 2; // if the angle difference in degrees between two segments is smaller than this, then the segments will be merged
+	static float bordersnap = 20; //How close the line has to be to the border before it will snap into it.
+	static float segmentdelta = 2; // what is the minimum distance that characterizes a new segment?
 
 	public Array<Vector2> dividingLine;
 	public Vector2[] borders;
@@ -100,8 +99,8 @@ public class LineInput {
 	
 	public void addInput(Vector2 input)
 	{
-		if (dividingLine.size > 0 && input.epsilonEquals(dividingLine.peek(), 2f))
-			return; // 
+		if (dividingLine.size > 0 && input.epsilonEquals(dividingLine.peek(), segmentdelta))
+			return;
 		Vector2 prein = null;
 		
 		if (dividingLine.size > 0) 
@@ -141,25 +140,52 @@ public class LineInput {
 		// calculate distance between first and last points and the borders
 		Vector2 first = dividingLine.first();
 		Vector2 last = dividingLine.peek();
-		float maxdist = 15;
 		
-		int closefirst;
-		int closelast;
+		
+		//FIXME: is the value for bordersnap correct?
+		int closefirst = -1;
+		float firstdist = bordersnap;
+		
+		int closelast = -1;
+		float lastdist = bordersnap;
 		for (int i = 0; i < 4; i++)
 		{
-			Intersector.distanceLinePoint(borders[i], borders[(i+1)%4], first);
-			Intersector.pointLineSide(borders[i], borders[(i+1)%4], first);// negative for inside
-	
+			if ((Intersector.pointLineSide(borders[i], borders[(i+1)%4], first) == -1) &&
+				(Intersector.distanceLinePoint(borders[i], borders[(i+1)%4], first) < firstdist))
+			{
+				firstdist = Intersector.distanceLinePoint(borders[i], borders[(i+1)%4], first);
+				closefirst = i;
+			}
 			
-//			intersectLines(Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4, Vector2 intersection)
-//			Intersects the two lines and returns the intersection point in intersection.
+			if ((Intersector.pointLineSide(borders[i], borders[(i+1)%4], last) == -1) &&
+					(Intersector.distanceLinePoint(borders[i], borders[(i+1)%4], last) < lastdist))
+				{
+					lastdist = Intersector.distanceLinePoint(borders[i], borders[(i+1)%4], last);
+					closelast = i;
+				}
+		}
 			
-			Intersector.distanceLinePoint(borders[i], borders[(i+1)%4], last);
-			Intersector.pointLineSide(borders[i], borders[(i+1)%4], last); // negative for inside
+		if (closefirst != -1)
+		{
+			Vector2 first2 = dividingLine.get(1);
+			Vector2 tmp = new Vector2();
+			Intersector.intersectLines(first, first2, borders[closefirst], borders[(closefirst+1)%4], tmp);
+			dividingLine.insert(0, tmp);
+			bordercross++;
 		}
 		
-		// TODO: Write this function
-		// Indicates that the line is over - needs to test if the borders of the line can be snapped.
+		if (closelast != -1)
+		{
+			Vector2 last2 = dividingLine.get(dividingLine.size-2);
+			Vector2 tmp = new Vector2();
+			Intersector.intersectLines(last, last2, borders[closelast], borders[(closelast+1)%4], tmp);
+			dividingLine.add(tmp);
+			bordercross++;
+		}
+		
+		if (bordercross > 1) // test if the new vectors made the line valid
+			valid = true;
+			
 	}
 	
 }

@@ -37,11 +37,11 @@ looks too washed out.
     Make the open list private, and create public function
     "isStageUnlocked()".
 
-** TODO Improve game interface
+** DONE Improve game interface
 - [X] Move "line" to a separate class (same behavior)
 - [X] Remove drawing timeout OR add timeout indicator; -- apparently, I can deal with pretty long lines
 - [X] Game detects an incomplete line and cancel the line;
-- [ ] Game detects an "almost complete" line, and completes that line;
+- [X] Game detects an "almost complete" line, and completes that line;
 
 *** LineInput object
 - clear() // clears the line
