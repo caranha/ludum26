@@ -20,6 +20,8 @@ public class ludum26entry extends Game {
 	static AssetManager manager;
 	LevelManager lmanager;
 	
+	static final String VERSION = "Version 1.1.0";
+	
 
 	// Called when the game is first started
 	@Override
@@ -48,7 +50,8 @@ public class ludum26entry extends Game {
 		manager.load("fairking.png", Texture.class);
 		manager.load("fairking2.png", Texture.class);
 		
-		manager.load("sawasdee.fnt", BitmapFont.class);
+		manager.load("sawasdee32.fnt", BitmapFont.class);
+		manager.load("sawasdee18.fnt", BitmapFont.class);
 		manager.load("Beaulieux.fnt", BitmapFont.class);
 		manager.load("Beaulieux-title.fnt", BitmapFont.class);
 		

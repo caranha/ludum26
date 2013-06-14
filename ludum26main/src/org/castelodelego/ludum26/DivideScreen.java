@@ -112,9 +112,9 @@ public class DivideScreen implements Screen {
 			
 			divline.clear();
 			
-			returnButton = new BitmapFontCache(ludum26entry.manager.get("sawasdee.fnt", BitmapFont.class),true);
-			titleText = new BitmapFontCache(ludum26entry.manager.get("sawasdee.fnt", BitmapFont.class),true);
-			scoreFont = ludum26entry.manager.get("sawasdee.fnt", BitmapFont.class);
+			returnButton = new BitmapFontCache(ludum26entry.manager.get("sawasdee32.fnt", BitmapFont.class),true);
+			titleText = new BitmapFontCache(ludum26entry.manager.get("sawasdee32.fnt", BitmapFont.class),true);
+			scoreFont = ludum26entry.manager.get("sawasdee32.fnt", BitmapFont.class);
 			textFont = ludum26entry.manager.get("Beaulieux.fnt", BitmapFont.class);
 			
 			fillingsnd = ludum26entry.manager.get("filling.ogg", Sound.class);

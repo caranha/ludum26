@@ -32,14 +32,20 @@ public class MainScreen implements Screen {
 	Texture kingest;
 	
 	BitmapFontCache titletext;
+	BitmapFontCache ld26text;
 
 	BitmapFontCache playbtn;
 	Rectangle playbtnBox;
 	
 	BitmapFontCache aboutbtn;
 	Rectangle aboutbtnBox;
+		
+	BitmapFontCache erasebtn;
+	Rectangle erasebtnBox;
 	
-	BitmapFontCache ld26text;
+	BitmapFontCache erasebtnConfirm;
+	Rectangle erasebtnConfirmBox;
+	
 	SelectBox menu;
 	Boolean master = false;
 	
@@ -50,11 +56,14 @@ public class MainScreen implements Screen {
 	static final int S_FADEIN = 0;
 	static final int S_FADEOUT = 2;
 	static final int S_NORMAL = 1;
+
+	
 	int currSTATE;
 	float fadestate;
-	
+		
 	static final int SS_main = 0;
 	static final int SS_select = 1;
+	static final int SS_delete = 2;
 	int substate;
 	
 	
@@ -78,31 +87,47 @@ public class MainScreen implements Screen {
 		// loading textures
 		king = ludum26entry.manager.get("fairking.png", Texture.class);
 		kingest = ludum26entry.manager.get("fairking2.png", Texture.class);
+		text = ludum26entry.manager.get("sawasdee32.fnt", BitmapFont.class);
 		
 		titletext = new BitmapFontCache(ludum26entry.manager.get("Beaulieux-title.fnt", BitmapFont.class),true);
 		titletext.addText("The Fair Kingo", 325, 430);
 		titletext.setColor(Color.DARK_GRAY);
 		
+		ld26text = new BitmapFontCache(ludum26entry.manager.get("sawasdee18.fnt", BitmapFont.class),true);
+		ld26text.addMultiLineText("A game for Ludum Dare 26, by caranha\n"+ludum26entry.VERSION, 830, 60, -60, HAlignment.RIGHT);
+		ld26text.setColor(Color.DARK_GRAY);
+		
 		mainmusic = ludum26entry.manager.get("purplewah.ogg",Music.class);
 		mainmusic.setLooping(true);
 		mainmusic.play();
 		
-		text = ludum26entry.manager.get("sawasdee.fnt", BitmapFont.class);
+
+		
 		playbtn = new BitmapFontCache(text,true);
 		aboutbtn = new BitmapFontCache(text,true);
-		ld26text = new BitmapFontCache(text,true);
+		erasebtn = new BitmapFontCache(text,true);
+		erasebtnConfirm = new BitmapFontCache(text,true);
 		
-		playbtn.addText("Play", 360, 250);
-		playbtnBox = new Rectangle(360, 250 - playbtn.getBounds().height, playbtn.getBounds().width,playbtn.getBounds().height);
+		// hardcoded offsets to make the touch areas bigger than the text
+		playbtn.addText("Play", 420, 290);
+		playbtnBox = new Rectangle(420-30, 290 - playbtn.getBounds().height-30, playbtn.getBounds().width+60,playbtn.getBounds().height+60);
 		
-		aboutbtn.addText("About", 600, 250);
-		aboutbtnBox = new Rectangle(600, 250 - aboutbtn.getBounds().height, aboutbtn.getBounds().width,aboutbtn.getBounds().height);
+		aboutbtn.addText("Help", 600, 290);
+		aboutbtnBox = new Rectangle(600-30, 290 - aboutbtn.getBounds().height-30, aboutbtn.getBounds().width+60,aboutbtn.getBounds().height+60);
 		
-		ld26text.addMultiLineText("A game for Ludum Dare 26\nby caranha", 800, 100, -60, HAlignment.RIGHT);
+		erasebtn.addText("Clear all data", 450, 160);
+		erasebtnBox = new Rectangle(450-15, 160 - erasebtn.getBounds().height-15, erasebtn.getBounds().width+30,erasebtn.getBounds().height+30);
 		
+		erasebtnConfirm.addMultiLineText("Erase the game's Internal Data?\nClick here to proceed.\nClick outside the box to cancel.", 400, 300, 0, HAlignment.CENTER);
+		erasebtnConfirmBox = new Rectangle(400 - erasebtnConfirm.getBounds().width/2 - 20, 300 - erasebtnConfirm.getBounds().height - 20, 
+										    erasebtnConfirm.getBounds().width+40, erasebtnConfirm.getBounds().height + 40);
+		
+
 		playbtn.setColor(Color.DARK_GRAY);
 		aboutbtn.setColor(Color.DARK_GRAY);
-		ld26text.setColor(Color.DARK_GRAY);
+		erasebtn.setColor(Color.DARK_GRAY);
+		erasebtnConfirm.setColor(Color.DARK_GRAY);
+
 		
 		menu = new SelectBox(335,16,450,450);
 		
@@ -132,9 +157,48 @@ public class MainScreen implements Screen {
 			batch.begin();
 			titletext.draw(batch);
 			playbtn.draw(batch);
-			aboutbtn.draw(batch);
+			aboutbtn.draw(batch);	
+			erasebtn.draw(batch);
 			ld26text.draw(batch);
 			batch.end();
+//			DEBUG: uncomment this to get the bounding box for the buttons			
+//			lineDrawer.setProjectionMatrix(camera.combined);
+//			lineDrawer.begin(ShapeType.Rectangle);
+//			lineDrawer.setColor(Color.BLACK);
+//			lineDrawer.rect(playbtnBox.x, playbtnBox.y, playbtnBox.width, playbtnBox.height);
+//			lineDrawer.rect(aboutbtnBox.x, aboutbtnBox.y, aboutbtnBox.width, aboutbtnBox.height);
+//			lineDrawer.rect(erasebtnBox.x, erasebtnBox.y, erasebtnBox.width, erasebtnBox.height);
+//			lineDrawer.end();
+		break;
+		
+		case SS_delete:	
+			batch.begin();
+			titletext.draw(batch);
+			playbtn.draw(batch);
+			aboutbtn.draw(batch);	
+			erasebtn.draw(batch);
+			ld26text.draw(batch);
+			batch.end();
+			
+			Gdx.gl.glEnable(GL20.GL_BLEND);
+			Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+			lineDrawer.setProjectionMatrix(camera.combined);
+			lineDrawer.begin(ShapeType.FilledRectangle);
+			lineDrawer.setColor(1f, 1f, 1f, 0.8f);
+			lineDrawer.filledRect(0, 0, 800, 480);	
+			lineDrawer.setColor(1f, 1f, 1f, 1f);
+			lineDrawer.filledRect(erasebtnConfirmBox.x, erasebtnConfirmBox.y, erasebtnConfirmBox.width, erasebtnConfirmBox.height);
+			lineDrawer.end();
+
+			lineDrawer.begin(ShapeType.Rectangle);
+			lineDrawer.setColor(Color.BLACK);
+			lineDrawer.rect(erasebtnConfirmBox.x, erasebtnConfirmBox.y, erasebtnConfirmBox.width, erasebtnConfirmBox.height);
+			lineDrawer.end();
+
+			batch.begin();
+			erasebtnConfirm.draw(batch);
+			batch.end();
+			
 		break;
 		case SS_select:
 			menu.Render(camera, lineDrawer, batch);
@@ -177,6 +241,10 @@ public class MainScreen implements Screen {
 						leavescreen = true;
 						nextScreen = g.about;
 					}
+					if (erasebtnBox.contains(touchpos.x, touchpos.y))
+					{
+						substate = SS_delete;
+					}
 					break;
 				case SS_select:
 					int ret = menu.catchClick(touchpos.x, touchpos.y);
@@ -185,6 +253,13 @@ public class MainScreen implements Screen {
 						leavescreen = true;
 						nextScreen = g.play;
 						g.play.curLevel = ret;
+					}
+					break;
+				case SS_delete:
+					substate = SS_main;
+					if (erasebtnConfirmBox.contains(touchpos.x, touchpos.y))
+					{
+						g.lmanager.resetLevelData();
 					}
 					break;
 				}

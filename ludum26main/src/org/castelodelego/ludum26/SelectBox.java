@@ -49,7 +49,7 @@ public class SelectBox {
 		h = hg;
 		bbox = new Rectangle(x,y,w-64,h);
 		
-		options = new BitmapFontCache(ludum26entry.manager.get("sawasdee.fnt", BitmapFont.class),true);
+		options = new BitmapFontCache(ludum26entry.manager.get("sawasdee32.fnt", BitmapFont.class),true);
 		options.setColor(Color.DARK_GRAY);
 		
 		btnTop = ludum26entry.manager.get("toparrow.png", Texture.class);

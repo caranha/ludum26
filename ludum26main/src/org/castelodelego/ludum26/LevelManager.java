@@ -13,7 +13,6 @@ public class LevelManager {
 			{ "levels/level1.png", "A Decision" },
 			{ "levels/level2.png", "Perspective" },
 			{ "levels/level3.png", "Planets" },
-			{ "levels/level4.png", "Snake" },
 			{ "levels/level5.png", "Settlers" },
 			{ "levels/level6.png", "Art" },
 			{ "levels/level7.png", "The Commons" },
@@ -22,10 +21,11 @@ public class LevelManager {
 			{ "levels/level10.png", "Night Forest" },
 			{ "levels/level11.png", "Loving You" },
 			{ "levels/level12.png", "Party" },
+			{ "levels/level4.png", "Snake" },
 			{ "levels/level13.png", "Emotions" },
 			{ "levels/level14.png", "Challenge" },
-			{ "levels/level15.png", "Strength" },
-			{ "levels/level16.png", "Passion" },
+			{ "levels/level15.png", "Passion" },
+			{ "levels/level16.png", "Strength" },
 			{ "levels/level17.png", "Final Revenge" }
 	};
 	

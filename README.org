@@ -24,18 +24,6 @@ looks too washed out.
 ** DONE Improve stage selection logic
 - [X] Remove the "click invisible stage" bug;
 - [X] Rework the logic for opening new stages; 
-  + Clearing a stage should open a new stage. Also getting a new "A"
-    should open an extra stage.  The new stage open should be
-    independent of the stage actually cleared.
-
-    How to do it: Keep a "number of scenarios opened" index - scenario
-    is open if it is under this index. Also keep a "scenario score"
-    array. This is updated when scenario is ended. If old score is "D"
-    or less, increase "open" index. If old score is not A, and new 
-    score is A, increase the index.
-
-    Make the open list private, and create public function
-    "isStageUnlocked()".
 
 ** DONE Improve game interface
 - [X] Move "line" to a separate class (same behavior)
@@ -43,37 +31,21 @@ looks too washed out.
 - [X] Game detects an incomplete line and cancel the line;
 - [X] Game detects an "almost complete" line, and completes that line;
 
-*** LineInput object
-- clear() // clears the line
-- drawCurrent() // draws the current line to the screen
-
-- isLineValid() // Tests whether the line is connected to the borders,
-  or has an internal circle
-
-- getLine() // gets the line to send to the divide logic
-
-- input ("X,Y") // (possibly) inserts a new x,y into 
-the line (checks if the X,Y is far enough)
-
-- finish() // indicates that the line is over. Here we try 
-to tie the ends of the line to the border os the screen.
-
-- float bordersnap; // distance that the ends of the line snap to the
-  border
-
+** TODO General Polish;
+- [X] Add a version counter
+- [X] Add a "clear data" button
+- [ ] Make the level selection screen easier to navigate;
+- [ ] Make buttons hit boxes larger;
+- [ ] Make the game look less washed out on Android;
+- [ ] Add some sort of marking for getting "A"s?
+  
 ** TODO Make game easier to understand
-- [ ] Move level 6 later into the game;
+- [X] Move level 6 later into the game;
 - [ ] Add a "Level Unlocked" message;
 - [ ] Improve the tutorial screens;
 - [ ] Add some in-game explanation messages;
+- [ ] Add "Select level" wording;
 	
-** TODO General Polish;
-- [ ] Make the level selection screen easier to navigate;
-- [ ] Make the game look less washed out on Android;
-- [ ] Make buttons hit boxes larger;
-- [ ] Add some sort of marking for getting "A"s?
-- [ ] Add a "clear data" button
-  
 ** TODO Other;
 - [ ] Add to Play Store.
 - [ ] Clear "Todo"s inside the code itself
