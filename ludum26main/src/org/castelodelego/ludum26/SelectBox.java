@@ -22,8 +22,7 @@ public class SelectBox {
 	Rectangle bbox;
 	
 	float curpos;
-	float desiredpos;
-	int selectpos;
+	int direction;
 	
 	float speed = 160;
 	float SNAP = 3;
@@ -73,14 +72,14 @@ public class SelectBox {
 		batch.flush();
 		ScissorStack.popScissors();
 		
-		if (selectpos == 0)
+		if (curpos == 0)
 			batch.setColor(1, 1, 1, 0.3f);
 		else
 			batch.setColor(1, 1, 1, 0.7f);
 		batch.draw(btnTop, btnTopBox.x, btnTopBox.y);
 
 		
-		if (selectpos == listlen-1)
+		if (curpos >= (listlen-9)*options.getFont().getLineHeight())
 			batch.setColor(1, 1, 1, 0.3f);
 		else
 			batch.setColor(1, 1, 1, 0.7f);
@@ -118,23 +117,20 @@ public class SelectBox {
 	{
 		if (minifade > 0)
 			minifade -= delta;
-			
-
 		
-		if (desiredpos != curpos)
-		{
-			if (Math.abs(curpos - desiredpos) < SNAP)
-			{
-				curpos = desiredpos;
-			}
-			else
-			{
-				if (desiredpos < curpos)
-					curpos -= speed*delta;
-				else
-					curpos += speed*delta;
-			}
-		}
+		// moving curpos
+		if (direction > 0)
+			curpos += speed*delta;
+		if (direction < 0)
+			curpos -= speed*delta;
+		
+		// clipping curpos
+		// Since the bottom clip is more strict, I do the bottom clip first
+		// Then the top clip. Order matters.
+		if (curpos > (listlen-9)*options.getFont().getLineHeight())
+			curpos = (listlen-9)*options.getFont().getLineHeight();
+		if (curpos < 0)
+			curpos = 0;
 
 		
 		options.setPosition(0, curpos);
@@ -148,26 +144,11 @@ public class SelectBox {
 	 */
 	public int catchClick(float x, float y)
 	{
+		
 		Gdx.app.log("Select Click", "caught: "+x+","+y);
 		
-		if (btnBottomBox.contains(x,y))
-		{
-			if (selectpos < listlen-1)
-			{
-				selectpos++;
-				desiredpos = selectpos*options.getFont().getLineHeight();
-
-			}
-		}
-		if (btnTopBox.contains(x,y))
-		{
-			if (selectpos > 0)
-			{
-				selectpos--;
-				desiredpos = selectpos*options.getFont().getLineHeight();
-			}
-		}
 		
+		// Selecting a stage
 		if (bbox.contains(x, y))
 		{
 			int ret = (int) Math.floor((this.y+this.h+curpos - y)/options.getFont().getLineHeight());
@@ -177,9 +158,32 @@ public class SelectBox {
 
 		}
 		
-		
 		return -1;
 	}
+	
+	public boolean catchPress(float x, float y)
+	{
+		// clicking on the top or bottom position
+		if (btnBottomBox.contains(x,y))
+		{
+			direction = 1;
+			return true;
+		}
+		if (btnTopBox.contains(x,y))
+		{
+			direction = -1;
+			return true;
+		}		
+		direction = 0;
+		return false;
+	}
+	public boolean releasePress()
+	{
+		direction = 0;
+		return true;
+	}
+	
+	
 	
 	/** Initialize the level selector **/
 	public void start(LevelManager l)
@@ -214,9 +218,7 @@ public class SelectBox {
 		}
 
 
-		selectpos = 0;
 		curpos = 0; 
-		desiredpos = 0;
 		
 		// set the maximum "currpos" places
 		// for debug, add everyone

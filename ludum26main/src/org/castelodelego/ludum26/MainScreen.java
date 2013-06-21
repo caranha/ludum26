@@ -222,7 +222,12 @@ public class MainScreen implements Screen {
 		/*** INPUT ***/
 		if (currSTATE == S_NORMAL) // IGNORE INPUT DURING FADE_IN/OUT
 		{
-			if(Gdx.input.justTouched())
+			
+			// FIXME: This code is uglier than my morning commute
+			// All clicks are touches, but not all touches are clicks
+			
+
+			if(Gdx.input.justTouched()) // processing "clicks"
 			{
 				Vector3 rawtouch = new Vector3(Gdx.input.getX(), Gdx.input.getY(),0);
 				camera.unproject(rawtouch);
@@ -263,6 +268,22 @@ public class MainScreen implements Screen {
 					}
 					break;
 				}
+			}
+			else if(Gdx.input.isTouched()) // processing "presses"
+			{
+				Vector3 rawtouch = new Vector3(Gdx.input.getX(), Gdx.input.getY(),0);
+				camera.unproject(rawtouch);
+				Vector2 touchpos = new Vector2(rawtouch.x, rawtouch.y);
+				switch (substate)
+				{
+				case SS_select:
+					menu.catchPress(touchpos.x, touchpos.y);
+					break;
+				}
+			}
+			else //release all touches
+			{
+				menu.releasePress();
 			}
 		}
 		

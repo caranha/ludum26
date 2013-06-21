@@ -52,6 +52,8 @@ public class DivideScreen implements Screen {
 	Texture puzzleFlood;
 	private float timeaccum; // used to calculate flooding time
 	
+	boolean newlevels; // new levels were unlocked!
+	
 	BitmapFontCache returnButton;
 	BitmapFontCache titleText;
 	BitmapFont scoreFont;
@@ -101,6 +103,8 @@ public class DivideScreen implements Screen {
 		
 		initialized = false;
 		curLevel = 0;
+		
+		newlevels = false;
 	}
 	
 	public void init()
@@ -149,7 +153,8 @@ public class DivideScreen implements Screen {
 
 			puzzlepos = new Vector2(50,50);
 			nowDrawing = false;		
-			startflood = false;			
+			startflood = false;
+			newlevels = false;
 		}
 		initialized = true;
 	}
@@ -227,6 +232,9 @@ public class DivideScreen implements Screen {
 			lineDrawer.filledRect(0, 0, 800, 480);		
 			lineDrawer.end();
 		}
+		
+		
+		
 		
 		/*** INPUT BLOCK ***/
 				
@@ -354,7 +362,7 @@ public class DivideScreen implements Screen {
 	public void setScoreScene()
 	{
 		nextScreen = g.play;
-		g.lmanager.setScore(curLevel, puzzle.score);
+		newlevels = g.lmanager.setScore(curLevel, puzzle.score);
 		if (puzzle.score > 0)
 		{
 			curLevel = g.lmanager.getNext(curLevel);
@@ -377,44 +385,26 @@ public class DivideScreen implements Screen {
 		lineDrawer.setColor(1f, 1f, 1f, ((scoretimer/SCORETIME)/3));
 		lineDrawer.filledRect(50, 50, 700, 380);		
 		lineDrawer.end();
-		
-		// drawing the circles
 
-		int len = puzzle.scorecolor.length;
-		int circletop = 260 - (len-1)*22;
-		Color circledraw = new Color();
 		String scoretext = "";
-		
-		lineDrawer.begin(ShapeType.FilledCircle);
-		for (int i = 0; i < len; i++)
-		{
-			lineDrawer.setColor(Color.BLACK);
-			lineDrawer.filledCircle(350, circletop + i*44, 20);
-			Color.rgba8888ToColor(circledraw, puzzle.colortable[i]);
-			lineDrawer.setColor(circledraw);
-			lineDrawer.filledCircle(350, circletop + i*44, 16);
-		}		
-		lineDrawer.end();
-		
+
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
+		// Success Text
 
-		textFont.setColor(Color.BLACK);
-		textFont.drawMultiLine(batch, "Score:", 400, circletop + len*44 + 20, 0, BitmapFont.HAlignment.CENTER);
-		
 		switch(puzzle.score)
 		{
 		case 0:
-			scoretext = "Rank D\nTry again...";
+			scoretext = "Rank D: Try again...";
 			break;
 		case 1:
-			scoretext = "Rank C\nSuccess!";
+			scoretext = "Rank C: Success!";
 			break;
 		case 2:
-			scoretext = "Rank B\nSuccess!";
+			scoretext = "Rank B: Success!";
 			break;
 		case 3:
-			scoretext = "Rank A\nSuccess!";
+			scoretext = "Rank A: Success!";
 			break;
 		}
 
@@ -423,23 +413,75 @@ public class DivideScreen implements Screen {
 		else
 			textFont.setColor(Color.GREEN);
 			
-		textFont.drawMultiLine(batch, scoretext, 400, circletop - 40, 0, BitmapFont.HAlignment.CENTER);
+		textFont.drawMultiLine(batch, scoretext, 400, 380, 0, BitmapFont.HAlignment.CENTER);
+		if (newlevels) 
+			textFont.drawMultiLine(batch, "New Level Unlocked!", 400, 150, 0, BitmapFont.HAlignment.CENTER);
+		textFont.drawMultiLine(batch, "Score by color:", 400, 330, 0, BitmapFont.HAlignment.CENTER);
+		
 		textFont.setColor(Color.BLACK);
-		textFont.drawMultiLine(batch, scoretext, 400+1, circletop - 41, 0, BitmapFont.HAlignment.CENTER);
+		textFont.drawMultiLine(batch, scoretext, 400+1, 380, 0, BitmapFont.HAlignment.CENTER);
+		if (newlevels) 
+			textFont.drawMultiLine(batch, "New Level Unlocked!", 400+1, 150, 0, BitmapFont.HAlignment.CENTER);
+		textFont.drawMultiLine(batch, "Score by color:", 400+1, 330, 0, BitmapFont.HAlignment.CENTER);
+		
+
+		
+		batch.end();
+		
+		// Score per color
+		int len = puzzle.scorecolor.length;
+		Color blockColor = new Color();
+		lineDrawer.begin(ShapeType.FilledRectangle);
+
+		// Total width of color bars: 80*len - 10
+		// Middle of the screen: 400
+		// X coordinate of the color bars: 400 - (80*len-10)/2
+		int blockx = 400 - (80*len-10)/2;
+		int blocky = 170;
+		
 		
 		for (int i = 0; i < len; i++)
 		{
-			if (puzzle.scorecolor[i] < 0.45)
-				scoreFont.setColor(Color.BLUE);
-			else if (puzzle.scorecolor[i] > 0.55)
-				scoreFont.setColor(Color.RED);
-			else
-				scoreFont.setColor(Color.BLACK);
-			
-			scoretext = (Math.round(puzzle.scorecolor[i]*10000)/100f)+"%";
-			scoreFont.draw(batch, scoretext, 380, circletop + i*44 + (scoreFont.getCapHeight()/2));
+			Color.rgba8888ToColor(blockColor, puzzle.colortable[i]);
+			drawColorBlock(blockx,blocky,blockColor,puzzle.scorecolor[i]);
+			blockx += 80;
 		}
-		batch.end();
+		lineDrawer.end();
+		
+	}
+	
+	void drawColorBlock(float posx, float posy, Color c, float score)
+	{
+		
+		int w = 70;
+		int h = 100;
+		lineDrawer.setColor(Color.BLACK);
+		lineDrawer.filledRect(posx, posy, w+1, h);
+		lineDrawer.setColor(c);
+		lineDrawer.filledRect(posx+3, posy+3, (w-6)/2, h-6);
+		
+		/* normally the score is 0 for blue, and 1 for red. However, we want to do some
+		 * Vertical exaggeration. So any score below 0.3 is 0.05 for blue, and any score above
+		 * 0.7 is 0.95 for red.
+		 */
+		
+		float adjscore = score;
+		if (adjscore < 0.2)
+			adjscore = 0.05f;
+		else if (adjscore > 0.8)
+			adjscore = 0.95f;
+		else
+			adjscore = (adjscore - 0.2f)*(0.9f/0.6f) + 0.05f;
+		
+		
+		lineDrawer.setColor(Color.RED);
+		lineDrawer.filledRect(posx+(w/2)+3, posy+3, w/2-5, (h-6)*adjscore);
+		lineDrawer.setColor(Color.BLUE);
+		lineDrawer.filledRect(posx+(w/2)+2.3f, posy+4+(h-6)*adjscore, w/2-5f, (h-7)*(1-adjscore));
+		lineDrawer.setColor(Color.GRAY);
+		lineDrawer.filledRect(posx+(w/2)+3, posy+h/2-1, w/2-5f, 2);
+		
+		//System.out.println(adjscore);
 		
 	}
 	
