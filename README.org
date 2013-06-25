@@ -35,27 +35,24 @@ looks too washed out.
 - [X] Add a version counter
 - [X] Add a "clear data" button
 - [X] Make the level selection screen easier to navigate;
-   X - navigation buttons should receive continuous clicks, and not "touch and click"
-   X - navigation should stop when the last name is on the bottom, not the top
-   - should navigate on swipe gestures
 - [X] Make buttons hit boxes larger;
 - [ ] Make the game look less washed out on Android;
   
 ** TODO Make game easier to understand
 - [X] Move level 6 later into the game;
 - [X] Improve the "score" screen
-- [ ] Improve the tutorial screens;
-  + Rewrite phrasing of screens 1 and 2
-  + Add an HTML link for screen 3
+- [X] Improve the tutorial screens;
 	
 ** TODO Other;
 - [ ] Add 1.1 to Play Store.
 - [ ] Clear "Todo"s inside the code itself
 - [ ] Comment each function
 
-** TODO 1.2 Additions
+** TODO later Additions
 - [ ] Add some in-game explanation messages;
   + What kind of messages?
 - [ ] Add "Select level" wording;
   + Change Level selection screen to add an obvious "select level" message
 - [ ] Add some marking on the "king" as you get more As
+- [ ] Make Game respond to Swipe and Pan gestures
+- [ ] Make "about" screen pan around a bit better

@@ -155,6 +155,7 @@ public class MainScreen implements Screen {
 		{
 		case SS_main:
 			batch.begin();
+			batch.setColor(1, 1, 1,1f);
 			titletext.draw(batch);
 			playbtn.draw(batch);
 			aboutbtn.draw(batch);	

@@ -2,6 +2,7 @@ package org.castelodelego.ludum26;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -11,6 +12,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.sun.jndi.toolkit.url.Uri;
 
 public class AboutScreen implements Screen {
 
@@ -26,6 +28,7 @@ public class AboutScreen implements Screen {
 	Rectangle btnLeftBox;
 	Texture btnRight;
 	Rectangle btnRightBox;
+	Rectangle linkBox;
 	
 	Texture[] aboutscrns;
 	
@@ -73,6 +76,8 @@ public class AboutScreen implements Screen {
 		btnTop = ludum26entry.manager.get("toparrow.png", Texture.class);
 		btnTopBox = new Rectangle(368,410,64,64);
 		initdone = true;
+		
+		linkBox = new Rectangle(0,0,800,100);
 	}
 	
 	
@@ -86,6 +91,7 @@ public class AboutScreen implements Screen {
 		// Drawing Sprites
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
+		batch.setColor(1, 1, 1, 1f);
 		for (int i = 0; i < 3; i++)
 		{
 			batch.draw(aboutscrns[i], 800*i - currpos, 0);
@@ -97,6 +103,12 @@ public class AboutScreen implements Screen {
 		batch.draw(btnLeft, btnLeftBox.x, btnLeftBox.y);
 		batch.draw(btnRight, btnRightBox.x, btnRightBox.y);
 		batch.end();
+		
+//		lineDrawer.setProjectionMatrix(camera.combined);
+//		lineDrawer.begin(ShapeType.Rectangle);
+//		lineDrawer.setColor(Color.BLACK);
+//		lineDrawer.rect(linkBox.x, linkBox.y, linkBox.width, linkBox.height);	
+//		lineDrawer.end();
 		
 		// Drawing Fade
 		if (currSTATE == S_FADEIN || currSTATE == S_FADEOUT) 
@@ -129,21 +141,16 @@ public class AboutScreen implements Screen {
 				}
 				
 				if (btnRightBox.contains(touchpos.x, touchpos.y))
-				{
-					if (selectedindex < 2)
-					{
-						selectedindex++;
-						desiredpos = selectedindex*800;
-					}
-				}
+					selectedindex++;
+				
 				if (btnLeftBox.contains(touchpos.x, touchpos.y))
-				{
-					if (selectedindex > 0)
-					{
-						selectedindex--;
-						desiredpos = selectedindex*800;
-					}
-				}
+					selectedindex--;
+				
+				selectedindex = (selectedindex+3)%3;
+				desiredpos = selectedindex*800;
+				
+				if (linkBox.contains(touchpos.x, touchpos.y) && selectedindex == 2)
+					g.w.callWebpage("http://www.xkcd.org");
 			}
 		}
 		

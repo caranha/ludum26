@@ -12,6 +12,8 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 
 public class ludum26entry extends Game {
 	
+	WebpageCaller w;
+	
 	SplashScreen splash;
 	MainScreen title;
 	AboutScreen about;
@@ -22,7 +24,12 @@ public class ludum26entry extends Game {
 	
 	static final String VERSION = "Version 1.1.0";
 	
-
+	public ludum26entry(WebpageCaller webcaller)
+	{
+		super();
+		w = webcaller;
+	}
+	
 	// Called when the game is first started
 	@Override
 	public void create() {		
@@ -37,7 +44,7 @@ public class ludum26entry extends Game {
 		lmanager = new LevelManager();
 		lmanager.loadLevelData();
 		
-		Gdx.app.setLogLevel(Application.LOG_NONE);
+		Gdx.app.setLogLevel(Application.LOG_DEBUG);
 		setScreen(splash); 
 	
 	}
