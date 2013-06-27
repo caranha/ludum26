@@ -342,9 +342,11 @@ public class DivideScreen implements Screen {
 			timeaccum += delta;
 			while (timeaccum > flooddelta)
 			{
+				boolean done = false;
 				timeaccum -= flooddelta;
-				if (puzzle.floodfill(floodsteps))
+				if (puzzle.floodfill(floodsteps) && !done)
 				{
+					done = true;
 					curState = STATE_WAIT;
 					fillingsnd.stop();
 					puzzle.setScore();

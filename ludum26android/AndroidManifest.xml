@@ -6,12 +6,16 @@
 
     <uses-sdk android:minSdkVersion="5" android:targetSdkVersion="17" />
 
+    <!-- Tell the system this app requires OpenGL ES 2.0. -->
+    <!-- I think this is necessary. Need to try on non OGL2.0 devices -->
+    <uses-feature android:glEsVersion="0x00020000" android:required="true" />
+    
     <application
         android:icon="@drawable/ic_launcher"
         android:label="The Fair King">
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name"
+            android:label="The Fair King"
             android:screenOrientation="landscape"
             android:configChanges="keyboard|keyboardHidden|orientation">
             <intent-filter>

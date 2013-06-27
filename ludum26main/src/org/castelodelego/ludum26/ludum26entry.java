@@ -44,7 +44,7 @@ public class ludum26entry extends Game {
 		lmanager = new LevelManager();
 		lmanager.loadLevelData();
 		
-		Gdx.app.setLogLevel(Application.LOG_DEBUG);
+		Gdx.app.setLogLevel(Application.LOG_NONE);
 		setScreen(splash); 
 	
 	}

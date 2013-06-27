@@ -2,7 +2,6 @@ package org.castelodelego.ludum26;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -12,7 +11,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.sun.jndi.toolkit.url.Uri;
 
 public class AboutScreen implements Screen {
 
@@ -150,7 +148,7 @@ public class AboutScreen implements Screen {
 				desiredpos = selectedindex*800;
 				
 				if (linkBox.contains(touchpos.x, touchpos.y) && selectedindex == 2)
-					g.w.callWebpage("http://www.xkcd.org");
+					g.w.callWebpage("http://claus.castelodelego.org/flyingrock");
 			}
 		}
 		
