@@ -2,18 +2,19 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.castelodelego.ludum26"
     android:versionCode="1"
-    android:versionName="1.0.1" >
+    android:versionName="1.0.1" 
+    android:installLocation="auto">
 
-    <uses-sdk android:minSdkVersion="5" android:targetSdkVersion="17" />
+<uses-sdk android:minSdkVersion="5" android:targetSdkVersion="17" />
 
-    <!-- Tell the system this app requires OpenGL ES 2.0. -->
-    <!-- I think this is necessary. Need to try on non OGL2.0 devices -->
-    <uses-feature android:glEsVersion="0x00020000" android:required="true" />
+<!-- Tell the system this app requires OpenGL ES 2.0. -->
+<!-- I think this is necessary. Need to try on non OGL2.0 devices -->
+<uses-feature android:glEsVersion="0x00020000" android:required="true" />
     
-    <application
-        android:icon="@drawable/ic_launcher"
-        android:label="The Fair King">
-        <activity
+	<application
+		android:icon="@drawable/ic_launcher"
+    	android:label="The Fair King">
+		<activity
             android:name=".MainActivity"
             android:label="The Fair King"
             android:screenOrientation="landscape"

@@ -15,44 +15,55 @@ and Android.
 
 * Goals
 
-My general goal for this project is to remove most of the interface
-bugs and unintuitive behavior by the end of the month. If possible, I
-would also like to improve the look of the game on Android a bit - it
-looks too washed out.
+To be a simple, easy to pick up, puzzle game for Android and 
+Desktop. To periodically add new stages and little secrets.
 
-* Task List
+
+* Standing Issues
+- [ ] "Set all stages to "C" at once (On imakura's phone)
+- [ ] Repeat-click on level select (On my tablet)
+- [ ] Level select stages are hard to click on small screens
+- [ ] Stage Select Screen is not obvious
+
+
+* Version 1.1.1 Tasklist
+** TODO Other:
+- [ ] Change the XML version number to 1.1.1
+- [ ] Clear TODOs inside the code
+- [ ] Comment each function
+
+** TODO Level Selection Screen:
+- [ ] Add "Select Level" text
+- [ ] Make new levels a bit more obvious
+- [ ] Make level buttons bigger
+- [ ] Make Level selection react to gestures
+
+** TODO Game understandability
+- [ ] On "settlers" stage, make middle area white
+- [ ] Add "game hints" before each stage
+
+** TODO Quality of Life
+- [ ] Add more levels
+- [ ] Add bonus for level completes:
+  + New king images
+  + other extras
+
+* DONE Version 1.1.0 Changelog
 ** DONE Improve stage selection logic
 - [X] Remove the "click invisible stage" bug;
-- [X] Rework the logic for opening new stages; 
-
+- [X] Rework the logic for opening new stages;
 ** DONE Improve game interface
 - [X] Move "line" to a separate class (same behavior)
 - [X] Remove drawing timeout OR add timeout indicator; -- apparently, I can deal with pretty long lines
 - [X] Game detects an incomplete line and cancel the line;
 - [X] Game detects an "almost complete" line, and completes that line;
-
-** TODO General Polish;
+** DONE General Polish;
 - [X] Add a version counter
 - [X] Add a "clear data" button
 - [X] Make the level selection screen easier to navigate;
 - [X] Make buttons hit boxes larger;
-- [ ] Make the game look less washed out on Android;
-  
-** TODO Make game easier to understand
+- [X] Make the game look less washed out on Android;
+** DONE Make game easier to understand
 - [X] Move level 6 later into the game;
 - [X] Improve the "score" screen
 - [X] Improve the tutorial screens;
-	
-** TODO Other;
-- [ ] Add 1.1 to Play Store.
-- [ ] Clear "Todo"s inside the code itself
-- [ ] Comment each function
-
-** TODO later Additions
-- [ ] Add some in-game explanation messages;
-  + What kind of messages?
-- [ ] Add "Select level" wording;
-  + Change Level selection screen to add an obvious "select level" message
-- [ ] Add some marking on the "king" as you get more As
-- [ ] Make Game respond to Swipe and Pan gestures
-- [ ] Make "about" screen pan around a bit better
